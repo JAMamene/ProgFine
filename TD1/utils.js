@@ -21,7 +21,7 @@ Array.prototype.equals = function (array) {
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 
 function swap(array, i,j) {
-    let tmp = array[i];
-    array[i] = array[j];
+    let tmp = array[j];
+    array[j] = array[i];
     array[i] = tmp;
 }
