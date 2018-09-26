@@ -14,13 +14,12 @@ function heapSort(array) {
         end--;
         siftDown(array, 0, end);
     }
-    console.log(array);
 }
 
-function heapify(array, count) {
-    let start = iParent(count - 1);
+function heapify(array) {
+    let start = iParent(array.length - 1);
     while (start >= 0) {
-        siftDown(array, start, count - 1);
+        siftDown(array, start, array.length - 1);
         start--;
     }
 }
@@ -33,6 +32,9 @@ function siftDown(array, start, end) {
         if (array[swapper] < array[child]) {
             swapper = child;
         }
+        if (child + 1 <= end && array[swapper] < array[child + 1]) {
+            swapper = child + 1;
+        }
         if (swapper === root) {
             return;
         }
@@ -42,7 +44,3 @@ function siftDown(array, start, end) {
         }
     }
 }
-
-let tab = [5, 2, 3, 4, 1];
-heapSort(tab);
-console.assert(tab.equals([1, 2, 3, 4, 5]), "heapSort Error", tab);
