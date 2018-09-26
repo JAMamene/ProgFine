@@ -14,3 +14,8 @@ function insertionSortR(array, n) {
         array[j+1] = x;
     }
 }
+
+let tab = [5,2,3,4,1];
+insertionSort(tab);
+console.log(tab);
+console.assert(tab.equals([1,2,3,4,5]),"insertionSort Error");
