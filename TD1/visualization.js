@@ -19,7 +19,6 @@ for (let i = 0; i < ns.length; i++) {
             return a + b;
         });
         let avg = sum / times.length;
-        console.log(Math.log2(avg));
         datum[k + 1] = Math.log2(avg);
     }
     scores[i] = datum;
@@ -33,10 +32,10 @@ function drawChart() {
     }
     scores.unshift(legend);
     console.log(scores);
-    var data = google.visualization.arrayToDataTable(
+    let data = google.visualization.arrayToDataTable(
         scores
     );
-    var options = {
+    let options = {
         chartArea: {width: '60%'},
         trendlines: {
             0: {
@@ -63,10 +62,15 @@ function drawChart() {
                 type: 'linear',
                 showR2: true,
                 visibleInLegend: true
+            },
+            5: {
+                type: 'linear',
+                showR2: true,
+                visibleInLegend: true
             }
         }
     };
 
-    var chartLinear = new google.visualization.ScatterChart(document.getElementById('chartLinear'));
+    let chartLinear = new google.visualization.ScatterChart(document.getElementById('chartLinear'));
     chartLinear.draw(data, options);
 }
