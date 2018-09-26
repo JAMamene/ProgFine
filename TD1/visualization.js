@@ -82,7 +82,7 @@ function drawChart() {
 
     for (let i = 0; i < functions.length; i++) {
 
-        let currentChart = candleCharts[i]
+        let currentChart = candleCharts[i];
 
         //handle a hole in the values
         while (sparseIndex(currentChart) !== false) {
