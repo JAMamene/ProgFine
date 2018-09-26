@@ -1,8 +1,6 @@
 google.charts.load('current', {'packages': ['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 
-insertionSort(0);
-
 function drawChart() {
     var data = google.visualization.arrayToDataTable([
         ['Age', 'Weight'],
