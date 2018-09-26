@@ -1,16 +1,10 @@
 function insertionSort(array) {
-    insertionSortR(array, array.length-1);
-}
-
-function insertionSortR(array, n) {
-    if (n > 0) {
-        insertionSortR(array, n - 1);
-        let x = array[n];
-        let j = n-1;
-        while (j>=0 && array[j] > x) {
-            array[j+1] = array[j];
-            j--;
+    for (let i = 1; i < array.length; i++) {
+        let x = array[i];
+        let j = i - 1;
+        for (; j >= 0 && array[j] > x; j--) {
+            array[j + 1] = array[j];
         }
-        array[j+1] = x;
+        array[j + 1] = x;
     }
 }
