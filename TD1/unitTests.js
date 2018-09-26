@@ -1,4 +1,4 @@
-let functions = [heapSort, insertionSort, mergeSort];
+let functions = [heapSort, insertionSort, mergeSort, quickSortRandom];
 let tabs = [
     [1],
     [1, 2],

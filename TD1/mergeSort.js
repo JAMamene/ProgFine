@@ -1,8 +1,15 @@
 function mergeSort(array) {
+    let result = mSort(array);
+    for (let i = 0; i < array.length; i++) {
+        array[i] = result[i];
+    }
+}
+
+function mSort(array) {
     if (array.length === 1) {
         return array;
     }
-    return merge(mergeSort(array.slice(0, array.length / 2)), mergeSort(array.slice(array.length / 2)));
+    return merge(mSort(array.slice(0, array.length / 2)), mSort(array.slice(array.length / 2)));
 }
 
 function merge(left, right) {
