@@ -1,5 +1,5 @@
 let functions = [heapSort, insertionSort, mergeSort, apiSort,
-    quickSortRandom, quickSortMedian3, quickSortFirst,
+    quickSortRandom, quickSortMedian3, quickSortFirst, quickSortMedian5,
     smoothSort];
 let tabs = [
     [1],

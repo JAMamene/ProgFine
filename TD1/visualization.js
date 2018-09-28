@@ -18,7 +18,8 @@ $(function () {
 });
 
 function runBench() {
-    let ns = [64, 256, 512, 1024, 2048, 4096, 8196];
+    let ns = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32700];
+    let bailoutTime = 40;
     let valuesScatter = new Array(ns.length);
     let candleCharts = new Array(functions.length);
     for (let i = 0; i < candleCharts.length; i++) {
@@ -26,13 +27,13 @@ function runBench() {
     }
     let entrySizeIndex = 0;
     (function loop() {
-        $(".progress-bar").css("width", entrySizeIndex + "%").attr("aria-valuenow", entrySizeIndex);
+        $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex);
         console.log(ns[entrySizeIndex]);
         let datumScatter = new Array(functions.length + 1);
         datumScatter[0] = Math.log2(ns[entrySizeIndex]);
         for (let algIndex = 0; algIndex < functions.length; algIndex++) {
             let datumCandle = new Array(5);
-            let times = measureTimes(functions[algIndex], ns[entrySizeIndex], 128, 20);
+            let times = measureTimes(functions[algIndex], ns[entrySizeIndex], 128, bailoutTime);
             if (times == null) {
                 console.log(functions[algIndex].name + " FAILED at " + ns[entrySizeIndex]);
             }
@@ -56,9 +57,15 @@ function runBench() {
         if (entrySizeIndex < ns.length) {
             setTimeout(loop, 0);
         }
+        else {
+            loadChart()
+        }
     })();
-    google.charts.load('current', {'packages': ['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
+
+    function loadChart() {
+        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+    }
 
     function drawChart() {
         let legend = new Array(functions.length + 1);
@@ -67,6 +74,7 @@ function runBench() {
             legend[i] = functions[i - 1].name;
         }
         valuesScatter.unshift(legend);
+        console.log(valuesScatter);
         let dataScatter = google.visualization.arrayToDataTable(
             valuesScatter
         );
@@ -129,7 +137,7 @@ function runBench() {
                 vAxis: {
                     viewWindow: {
                         min: 0,
-                        max: 20
+                        max: bailoutTime
                     }
                 },
             };
