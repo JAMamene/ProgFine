@@ -33,7 +33,7 @@ function measureTimes(alg, entrySize, iterations, maxMillis) {
 
 function runBench() {
     let ns = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
-    let bailoutTimeMS = 40;
+    let bailoutTimeMS = 32;
     let warmupOffset = 4;
     let valuesScatter = new Array(ns.length - warmupOffset);
     let candleCharts = new Array(algorithms.length);
@@ -76,7 +76,7 @@ function runBench() {
     })();
 
     function loadChart() {
-        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.load('upcoming', {'packages': ['corechart']});
         google.charts.setOnLoadCallback(drawChart);
         console.log(valuesScatter);
     }
@@ -103,7 +103,10 @@ function runBench() {
         }
         let optionsScatter = {
             title: 'Different sorting algorithm sorting speed by entry size',
-            chartArea: {width: '65%'},
+            chartArea: {
+                width: '70%',
+                right: '26%'
+            },
             explorer: {},
             hAxis: {
                 title: 'Size of entry (Log2(arraysize))',
@@ -121,6 +124,12 @@ function runBench() {
                     max: 20
                 },
             },
+            legend: {
+                textStyle: {
+                    fontSize: 14
+                }
+            },
+            height: 900,
             trendlines: trendlines
         };
 
