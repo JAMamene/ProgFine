@@ -1,45 +1,56 @@
+$(function () {
+    $("#runBench").click(runBench);
+});
+
 function measureTimes(alg, entrySize, iterations, maxMillis) {
     let times = new Array(iterations);
+    let oneChance = true;
     for (let i = 0; i < iterations; i++) {
-        let tab = Array.from({length: entrySize}, () => Math.floor(Math.random() * 1000));
+        let arr = randomGen(entrySize);
         let t0 = performance.now();
-        alg(tab);
+        try {
+            alg(arr);
+        }
+        catch (e) {
+            console.log(e);
+            return null;
+        }
         let t1 = performance.now();
         if ((t1 - t0) > maxMillis) {
-            return null;
+            if (oneChance) {
+                console.log(alg.name + " WARNING at " + entrySize);
+                oneChance = false;
+            }
+            else {
+                console.log(alg.name + " FAILED at " + entrySize);
+                return null;
+            }
         }
         times[i] = (t1 - t0) * 1000;
     }
     return times;
 }
 
-$(function () {
-    $("#runBench").click(runBench);
-});
-
 function runBench() {
-    let ns = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32700];
-    let bailoutTime = 40;
-    let valuesScatter = new Array(ns.length);
-    let candleCharts = new Array(functions.length);
+    let ns = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
+    let bailoutTimeMS = 40;
+    let warmupOffset = 4;
+    let valuesScatter = new Array(ns.length - warmupOffset);
+    let candleCharts = new Array(algorithms.length);
     for (let i = 0; i < candleCharts.length; i++) {
         candleCharts[i] = [];
     }
     let entrySizeIndex = 0;
     (function loop() {
-        $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex);
+        $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex).text(ns[entrySizeIndex]);
         console.log(ns[entrySizeIndex]);
-        let datumScatter = new Array(functions.length + 1);
+        let datumScatter = new Array(algorithms.length + 1);
         datumScatter[0] = Math.log2(ns[entrySizeIndex]);
-        for (let algIndex = 0; algIndex < functions.length; algIndex++) {
+        for (let algIndex = 0; algIndex < algorithms.length; algIndex++) {
             let datumCandle = new Array(5);
-            let times = measureTimes(functions[algIndex], ns[entrySizeIndex], 128, bailoutTime);
-            if (times == null) {
-                console.log(functions[algIndex].name + " FAILED at " + ns[entrySizeIndex]);
-            }
-            else {
+            let times = measureTimes(algorithms[algIndex], ns[entrySizeIndex], 64, bailoutTimeMS);
+            if (entrySizeIndex >= warmupOffset && times != null) {
                 let stats = statistics(times);
-
                 datumCandle[0] = "N=" + ns[entrySizeIndex];
                 let min = Math.log2(stats.min);
                 datumCandle[1] = min < 0 ? 0 : min;
@@ -52,10 +63,12 @@ function runBench() {
                 datumScatter[algIndex + 1] = Math.log2(stats.avg);
             }
         }
-        valuesScatter[entrySizeIndex] = datumScatter;
+        if (entrySizeIndex >= warmupOffset) {
+            valuesScatter[entrySizeIndex - warmupOffset] = datumScatter;
+        }
         entrySizeIndex++;
         if (entrySizeIndex < ns.length) {
-            setTimeout(loop, 0);
+            setTimeout(loop, 50);
         }
         else {
             loadChart()
@@ -65,13 +78,14 @@ function runBench() {
     function loadChart() {
         google.charts.load('current', {'packages': ['corechart']});
         google.charts.setOnLoadCallback(drawChart);
+        console.log(valuesScatter);
     }
 
     function drawChart() {
-        let legend = new Array(functions.length + 1);
+        let legend = new Array(algorithms.length + 1);
         legend[0] = "Size";
-        for (let i = 1; i <= functions.length; i++) {
-            legend[i] = functions[i - 1].name;
+        for (let i = 1; i <= algorithms.length; i++) {
+            legend[i] = algorithms[i - 1].name;
         }
         valuesScatter.unshift(legend);
         console.log(valuesScatter);
@@ -84,7 +98,7 @@ function runBench() {
             visibleInLegend: true
         };
         let trendlines = {};
-        for (let i = 0; i < functions.length; i++) {
+        for (let i = 0; i < algorithms.length; i++) {
             trendlines[i] = trendline;
         }
         let optionsScatter = {
@@ -100,7 +114,7 @@ function runBench() {
                 },
             },
             vAxis: {
-                title: 'Average time of execution (Log2(ms))',
+                title: 'Average time of execution (Log2(ns))',
                 minValue: 0,
                 viewWindow: {
                     min: 0,
@@ -118,7 +132,7 @@ function runBench() {
             "        <div class=\"tab-content\" id=\"algo-contents\"/>\n" +
             "    </div>");
 
-        for (let i = 0; i < functions.length; i++) {
+        for (let i = 0; i < algorithms.length; i++) {
 
             let currentChart = candleCharts[i];
 
@@ -130,28 +144,33 @@ function runBench() {
             let dataCandle = google.visualization.arrayToDataTable(currentChart, true);
 
             let optionsCandle = {
-                title: "Algorithm " + functions[i].name + " execution times",
+                title: "Algorithm " + algorithms[i].name + " execution times",
                 legend: 'none',
                 width: 800,
                 height: 400,
+                hAxis: {
+                    title: 'Size of entry',
+                },
                 vAxis: {
+                    title: 'Average time of execution (Log2(ns))',
                     viewWindow: {
                         min: 0,
-                        max: bailoutTime
-                    }
+                        max: 16,
+                    },
+                    ticks: [0, 4, 8, 12, 16]
                 },
             };
 
             $("#algo-tabs").append("" +
                 "<li class=\"nav-item\">\n" +
-                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + functions[i].name + "\" role=\"tab\"\n" +
-                "                   aria-controls=\"#chart-candle" + functions[i].name + "\" aria-selected=\"true\">" + functions[i].name + "</a>\n" +
+                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + algorithms[i].name + "\" role=\"tab\"\n" +
+                "                   aria-controls=\"#chart-candle" + algorithms[i].name + "\" aria-selected=\"true\">" + algorithms[i].name + "</a>\n" +
                 "</li>\n");
             $("#algo-contents").append("" +
-                "<div class=\"tab-pane fade\" id=\"chart-candle" + functions[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + functions[i].name + "\">" +
-                "    <div class=\"container\"><div id=\"chartCandle" + functions[i].name + "\" style=\"height: 400px; width: 800px; margin: auto\"></div></div>" +
+                "<div class=\"tab-pane fade\" id=\"chart-candle" + algorithms[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + algorithms[i].name + "\">" +
+                "    <div class=\"container\"><div id=\"chartCandle" + algorithms[i].name + "\" style=\"height: 400px; width: 800px; margin: auto\"></div></div>" +
                 "</div>");
-            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + functions[i].name)[0]);
+            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + algorithms[i].name)[0]);
             chartCandle.draw(dataCandle, optionsCandle);
         }
     }

@@ -1,6 +1,8 @@
-let functions = [heapSort, insertionSort, mergeSort, apiSort,
+let algorithms = [heapSort, insertionSort, mergeSort, apiSort,
     quickSortRandom, quickSortMedian3, quickSortFirst, quickSortMedian5,
-    smoothSort];
+    smoothSort, timSort];
+
+
 let tabs = [
     [1],
     [1, 2],
@@ -23,7 +25,7 @@ let results = [
 ];
 
 for (let i = 0; i < tabs.length; i++) {
-    functions.forEach(function (func) {
+    algorithms.forEach(function (func) {
         let tab = tabs[i].slice();
         func(tab);
         console.assert(tab.equals(results[i]), "FAIL " + func.name, tab);
