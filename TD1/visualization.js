@@ -76,6 +76,7 @@ function drawChart() {
             5: trendline,
             6: trendline,
             7: trendline,
+            8: trendline,
         }
     };
 

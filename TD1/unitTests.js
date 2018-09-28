@@ -1,5 +1,6 @@
 let functions = [heapSort, insertionSort, mergeSort, apiSort,
-    quickSortRandom, quickSortMedian3, quickSortFirst, smoothSort];
+    quickSortRandom, quickSortMedian3, quickSortFirst,
+    smoothSort];
 let tabs = [
     [1],
     [1, 2],
