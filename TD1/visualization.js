@@ -1,6 +1,3 @@
-google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(drawChart);
-
 function measureTimes(alg, entrySize, iterations, maxMillis) {
     let times = new Array(iterations);
     for (let i = 0; i < iterations; i++) {
@@ -16,94 +13,138 @@ function measureTimes(alg, entrySize, iterations, maxMillis) {
     return times;
 }
 
-let ns = [4, 16, 64, 256, 512, 1024, 2048, 4096, 8196];
-let valuesScatter = new Array(ns.length);
-let candleCharts = new Array(functions.length);
-for (let i = 0; i < candleCharts.length; i++) {
-    candleCharts[i] = [];
-}
+$(function () {
+    $("#runBench").click(runBench);
+});
 
-for (let entrySizeIndex = 0; entrySizeIndex < ns.length; entrySizeIndex++) {
-    let datumScatter = new Array(functions.length + 1);
-    datumScatter[0] = Math.log2(ns[entrySizeIndex]);
-    for (let algIndex = 0; algIndex < functions.length; algIndex++) {
-        let datumCandle = new Array(5);
-        let times = measureTimes(functions[algIndex], ns[entrySizeIndex], 128, 128);
-        if (times == null) {
-            console.log(functions[algIndex].name + " FAILED at " + ns[entrySizeIndex]);
-        }
-        else {
-            let stats = statistics(times);
-
-            datumCandle[0] = "N=" + ns[entrySizeIndex];
-            let min = Math.log2(stats.min);
-            datumCandle[1] = min < 0 ? 0 : min;
-            let inf = Math.log2(stats.avg - stats.stdDev / 2);
-            datumCandle[2] = isNaN(inf) || inf < 0 ? 0 : inf;
-            datumCandle[3] = Math.log2(stats.avg + stats.stdDev / 2);
-            datumCandle[4] = Math.log2(stats.max);
-            candleCharts[algIndex][entrySizeIndex] = datumCandle;
-
-            datumScatter[algIndex + 1] = Math.log2(stats.avg);
-        }
+function runBench() {
+    let ns = [64, 256, 512, 1024, 2048, 4096, 8196];
+    let valuesScatter = new Array(ns.length);
+    let candleCharts = new Array(functions.length);
+    for (let i = 0; i < candleCharts.length; i++) {
+        candleCharts[i] = [];
     }
-    valuesScatter[entrySizeIndex] = datumScatter;
-}
+    let entrySizeIndex = 0;
+    (function loop() {
+        $(".progress-bar").css("width", entrySizeIndex + "%").attr("aria-valuenow", entrySizeIndex);
+        console.log(ns[entrySizeIndex]);
+        let datumScatter = new Array(functions.length + 1);
+        datumScatter[0] = Math.log2(ns[entrySizeIndex]);
+        for (let algIndex = 0; algIndex < functions.length; algIndex++) {
+            let datumCandle = new Array(5);
+            let times = measureTimes(functions[algIndex], ns[entrySizeIndex], 128, 20);
+            if (times == null) {
+                console.log(functions[algIndex].name + " FAILED at " + ns[entrySizeIndex]);
+            }
+            else {
+                let stats = statistics(times);
 
-function drawChart() {
-    let legend = new Array(functions.length + 1);
-    legend[0] = "Size";
-    for (let i = 1; i <= functions.length; i++) {
-        legend[i] = functions[i - 1].name;
-    }
-    valuesScatter.unshift(legend);
-    let dataScatter = google.visualization.arrayToDataTable(
-        valuesScatter
-    );
-    let trendline = {
-        type: 'linear',
-        showR2: true,
-        visibleInLegend: true
-    };
-    let optionsScatter = {
-        chartArea: {width: '60%'},
-        trendlines: {
-            0: trendline,
-            1: trendline,
-            2: trendline,
-            3: trendline,
-            4: trendline,
-            5: trendline,
-            6: trendline,
-            7: trendline,
-            8: trendline,
+                datumCandle[0] = "N=" + ns[entrySizeIndex];
+                let min = Math.log2(stats.min);
+                datumCandle[1] = min < 0 ? 0 : min;
+                let inf = Math.log2(stats.avg - stats.stdDev / 2);
+                datumCandle[2] = isNaN(inf) || inf < 0 ? 0 : inf;
+                datumCandle[3] = Math.log2(stats.avg + stats.stdDev / 2);
+                datumCandle[4] = Math.log2(stats.max);
+                candleCharts[algIndex][entrySizeIndex] = datumCandle;
+
+                datumScatter[algIndex + 1] = Math.log2(stats.avg);
+            }
         }
-    };
-
-    let chartLinear = new google.visualization.ScatterChart(document.getElementById('chartLinear'));
-    chartLinear.draw(dataScatter, optionsScatter);
-
-    for (let i = 0; i < functions.length; i++) {
-
-        let currentChart = candleCharts[i];
-
-        //handle a hole in the values
-        while (sparseIndex(currentChart) !== false) {
-            currentChart.splice(sparseIndex(currentChart), 1);
+        valuesScatter[entrySizeIndex] = datumScatter;
+        entrySizeIndex++;
+        if (entrySizeIndex < ns.length) {
+            setTimeout(loop, 0);
         }
+    })();
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
 
-        let dataCandle = google.visualization.arrayToDataTable(currentChart, true);
-
-        let optionsCandle = {
-            title: "Algorithm " + functions[i].name + " execution times",
-            legend: 'none'
+    function drawChart() {
+        let legend = new Array(functions.length + 1);
+        legend[0] = "Size";
+        for (let i = 1; i <= functions.length; i++) {
+            legend[i] = functions[i - 1].name;
+        }
+        valuesScatter.unshift(legend);
+        let dataScatter = google.visualization.arrayToDataTable(
+            valuesScatter
+        );
+        let trendline = {
+            type: 'linear',
+            showR2: true,
+            visibleInLegend: true
+        };
+        let trendlines = {};
+        for (let i = 0; i < functions.length; i++) {
+            trendlines[i] = trendline;
+        }
+        let optionsScatter = {
+            title: 'Different sorting algorithm sorting speed by entry size',
+            chartArea: {width: '65%'},
+            explorer: {},
+            hAxis: {
+                title: 'Size of entry (Log2(arraysize))',
+                minValue: 0,
+                viewWindow: {
+                    min: 0,
+                    max: 20
+                },
+            },
+            vAxis: {
+                title: 'Average time of execution (Log2(ms))',
+                minValue: 0,
+                viewWindow: {
+                    min: 0,
+                    max: 20
+                },
+            },
+            trendlines: trendlines
         };
 
-        let d1 = document.getElementById('chartLinear');
-        d1.insertAdjacentHTML('afterend', '<div id="chartCandle' + functions[i].name + '" style="height: 500px; width: 80%"></div>');
+        let chartLinear = new google.visualization.ScatterChart($("#chartLinear")[0]);
+        chartLinear.draw(dataScatter, optionsScatter);
 
-        let chartCandle = new google.visualization.CandlestickChart(document.getElementById("chartCandle" + functions[i].name));
+        $("#chartLinear").after(" <div class=\"container-fluid\">\n" +
+            "        <ul class=\"nav nav-pills center-pills\" id=\"algo-tabs\" role=\"tablist\"></ul>\n" +
+            "        <div class=\"tab-content\" id=\"algo-contents\"/>\n" +
+            "    </div>");
 
-        chartCandle.draw(dataCandle, optionsCandle);
+        for (let i = 0; i < functions.length; i++) {
+
+            let currentChart = candleCharts[i];
+
+            //handle a hole in the values
+            while (sparseIndex(currentChart) !== false) {
+                currentChart.splice(sparseIndex(currentChart), 1);
+            }
+
+            let dataCandle = google.visualization.arrayToDataTable(currentChart, true);
+
+            let optionsCandle = {
+                title: "Algorithm " + functions[i].name + " execution times",
+                legend: 'none',
+                width: 800,
+                height: 400,
+                vAxis: {
+                    viewWindow: {
+                        min: 0,
+                        max: 20
+                    }
+                },
+            };
+
+            $("#algo-tabs").append("" +
+                "<li class=\"nav-item\">\n" +
+                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + functions[i].name + "\" role=\"tab\"\n" +
+                "                   aria-controls=\"#chart-candle" + functions[i].name + "\" aria-selected=\"true\">" + functions[i].name + "</a>\n" +
+                "</li>\n");
+            $("#algo-contents").append("" +
+                "<div class=\"tab-pane fade\" id=\"chart-candle" + functions[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + functions[i].name + "\">" +
+                "    <div class=\"container\"><div id=\"chartCandle" + functions[i].name + "\" style=\"height: 400px; width: 800px; margin: auto\"></div></div>" +
+                "</div>");
+            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + functions[i].name)[0]);
+            chartCandle.draw(dataCandle, optionsCandle);
+        }
     }
 }

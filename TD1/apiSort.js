@@ -1,3 +1,5 @@
 function apiSort(array) {
-    array.sort();
+    array.sort(function (a, b) {
+        return a - b;
+    });
 }
