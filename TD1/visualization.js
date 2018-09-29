@@ -1,12 +1,26 @@
 $(function () {
-    $("#runBench").click(runBench);
+    $("#runBench").click(function (e) {
+        e.preventDefault();
+        let bailoutTime = $("#bailoutTime").val();
+        let iterations = $("#iterations").val();
+        let arGenAlg = arGenAlgos[$("#arGen").val()];
+        let selectedAlgs = [];
+        $(".checkbox-alg:checked").each(function () {
+            selectedAlgs.push(algorithms[$(this).attr("id")]);
+        });
+        console.log("bailout : " + bailoutTime);
+        console.log("iterations : " + iterations);
+        console.log("Generation algorithm  : " + arGenAlg);
+        console.log("selected Algorithms : " + selectedAlgs);
+        runBench(arGenAlg, selectedAlgs, iterations, bailoutTime);
+    });
 });
 
-function measureTimes(alg, entrySize, iterations, maxMillis) {
+function measureTimes(alg, entrySize, iterations, maxMillis, arGenAlg) {
     let times = new Array(iterations);
     let oneChance = true;
     for (let i = 0; i < iterations; i++) {
-        let arr = randomGen(entrySize);
+        let arr = arGenAlg(entrySize);
         let t0 = performance.now();
         try {
             alg(arr);
@@ -31,12 +45,12 @@ function measureTimes(alg, entrySize, iterations, maxMillis) {
     return times;
 }
 
-function runBench() {
-    let ns = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
-    let bailoutTimeMS = 32;
+function runBench(arGenAlg, selectedAlgs, iterations, bailoutTime) {
+    let ns = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+    let bailoutTimeMS = bailoutTime;
     let warmupOffset = 4;
     let valuesScatter = new Array(ns.length - warmupOffset);
-    let candleCharts = new Array(algorithms.length);
+    let candleCharts = new Array(selectedAlgs.length);
     for (let i = 0; i < candleCharts.length; i++) {
         candleCharts[i] = [];
     }
@@ -44,11 +58,11 @@ function runBench() {
     (function loop() {
         $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex).text(ns[entrySizeIndex]);
         console.log(ns[entrySizeIndex]);
-        let datumScatter = new Array(algorithms.length + 1);
+        let datumScatter = new Array(selectedAlgs.length + 1);
         datumScatter[0] = Math.log2(ns[entrySizeIndex]);
-        for (let algIndex = 0; algIndex < algorithms.length; algIndex++) {
+        for (let algIndex = 0; algIndex < selectedAlgs.length; algIndex++) {
             let datumCandle = new Array(5);
-            let times = measureTimes(algorithms[algIndex], ns[entrySizeIndex], 64, bailoutTimeMS);
+            let times = measureTimes(selectedAlgs[algIndex], ns[entrySizeIndex], iterations, bailoutTimeMS, arGenAlg);
             if (entrySizeIndex >= warmupOffset && times != null) {
                 let stats = statistics(times);
                 datumCandle[0] = "N=" + ns[entrySizeIndex];
@@ -68,7 +82,7 @@ function runBench() {
         }
         entrySizeIndex++;
         if (entrySizeIndex < ns.length) {
-            setTimeout(loop, 50);
+            setTimeout(loop, 100);
         }
         else {
             loadChart()
@@ -82,13 +96,19 @@ function runBench() {
     }
 
     function drawChart() {
-        let legend = new Array(algorithms.length + 1);
+        $("#chartArea").empty().append("<div id=\"chartLinear\" style=\"width: 100%\"></div>\n");
+        $("#chartLinear").after(" <div class=\"container-fluid\">\n" +
+            "        <ul class=\"nav nav-pills center-pills\" id=\"algo-tabs\" role=\"tablist\"></ul>\n" +
+            "        <div class=\"tab-content\" id=\"algo-contents\"/>\n" +
+            "    </div>");
+
+
+        let legend = new Array(selectedAlgs.length + 1);
         legend[0] = "Size";
-        for (let i = 1; i <= algorithms.length; i++) {
-            legend[i] = algorithms[i - 1].name;
+        for (let i = 1; i <= selectedAlgs.length; i++) {
+            legend[i] = selectedAlgs[i - 1].name;
         }
         valuesScatter.unshift(legend);
-        console.log(valuesScatter);
         let dataScatter = google.visualization.arrayToDataTable(
             valuesScatter
         );
@@ -98,7 +118,7 @@ function runBench() {
             visibleInLegend: true
         };
         let trendlines = {};
-        for (let i = 0; i < algorithms.length; i++) {
+        for (let i = 0; i < selectedAlgs.length; i++) {
             trendlines[i] = trendline;
         }
         let optionsScatter = {
@@ -136,12 +156,7 @@ function runBench() {
         let chartLinear = new google.visualization.ScatterChart($("#chartLinear")[0]);
         chartLinear.draw(dataScatter, optionsScatter);
 
-        $("#chartLinear").after(" <div class=\"container-fluid\">\n" +
-            "        <ul class=\"nav nav-pills center-pills\" id=\"algo-tabs\" role=\"tablist\"></ul>\n" +
-            "        <div class=\"tab-content\" id=\"algo-contents\"/>\n" +
-            "    </div>");
-
-        for (let i = 0; i < algorithms.length; i++) {
+        for (let i = 0; i < selectedAlgs.length; i++) {
 
             let currentChart = candleCharts[i];
 
@@ -153,10 +168,10 @@ function runBench() {
             let dataCandle = google.visualization.arrayToDataTable(currentChart, true);
 
             let optionsCandle = {
-                title: "Algorithm " + algorithms[i].name + " execution times",
+                title: "Algorithm " + selectedAlgs[i].name + " execution times",
                 legend: 'none',
-                width: 800,
-                height: 400,
+                width: 950,
+                height: 450,
                 hAxis: {
                     title: 'Size of entry',
                 },
@@ -172,14 +187,14 @@ function runBench() {
 
             $("#algo-tabs").append("" +
                 "<li class=\"nav-item\">\n" +
-                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + algorithms[i].name + "\" role=\"tab\"\n" +
-                "                   aria-controls=\"#chart-candle" + algorithms[i].name + "\" aria-selected=\"true\">" + algorithms[i].name + "</a>\n" +
+                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + selectedAlgs[i].name + "\" role=\"tab\"\n" +
+                "                   aria-controls=\"#chart-candle" + selectedAlgs[i].name + "\" aria-selected=\"true\">" + selectedAlgs[i].name + "</a>\n" +
                 "</li>\n");
             $("#algo-contents").append("" +
-                "<div class=\"tab-pane fade\" id=\"chart-candle" + algorithms[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + algorithms[i].name + "\">" +
-                "    <div class=\"container\"><div id=\"chartCandle" + algorithms[i].name + "\" style=\"height: 400px; width: 800px; margin: auto\"></div></div>" +
+                "<div class=\"tab-pane fade\" id=\"chart-candle" + selectedAlgs[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + selectedAlgs[i].name + "\">" +
+                "    <div class=\"container\"><div id=\"chartCandle" + selectedAlgs[i].name + "\" style=\"height: 450px; width: 950px; margin: auto\"></div></div>" +
                 "</div>");
-            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + algorithms[i].name)[0]);
+            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + selectedAlgs[i].name)[0]);
             chartCandle.draw(dataCandle, optionsCandle);
         }
     }

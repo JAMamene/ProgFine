@@ -1,3 +1,5 @@
+var arGenAlgos = [randomGen, randomGenBigNumber, sortedAscend, sortedDescend, pseudoSorted, lottaSameValue];
+
 $(function () {
     // Not really functional
 //     $('#real').click(function () {
@@ -9,5 +11,35 @@ $(function () {
 //         });
 //     });
 
+    let options = [];
+    let src = new Array(arGenAlgos.length);
+    for (let i = 0; i < arGenAlgos.length; i++) {
+        src[i] = ({
+            id: i,
+            txt: arGenAlgos[i].name
+        });
+    }
+    src.forEach(function (arGenAlgo) {
+        let option = "<option value=" + arGenAlgo.id + ">" + arGenAlgo.txt + "</option>";
+        options.push(option);
+    });
+    let selector = $("#arGen");
+    selector.html(options).prop('selectedIndex', 0);
+    for (let i = 0; i < algorithms.length; i++) {
+        $("#checkboxes").append(
+            $("<div/>").addClass("col-md-3").append(
+                $("<div/>").addClass("custom-control").addClass("custom-checkbox")
+                    .append($("<input/>").attr({
+                            type: "checkbox",
+                            class: "custom-control-input checkbox-alg",
+                            id: i
+                        }), $("<label/>").attr({
+                            class: "custom-control-label",
+                            for: i,
+                        }).html(algorithms[i].name)
+                    )
+            )
+        )
+    }
 
 });
