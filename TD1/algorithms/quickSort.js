@@ -1,17 +1,31 @@
+let quickSortThreshold = 0;
+
 function quickSortRandom(array) {
-    qSort(array, randomPivot, 0, array.length - 1);
+    qSort(array, randomPivot, 0, array.length - 1, quickSortThreshold);
+}
+
+function quickSortMedian3(array) {
+    qSort(array, median3, 0, array.length - 1, quickSortThreshold);
+}
+
+function quickSortMedian5(array) {
+    qSort(array, median5, 0, array.length - 1, quickSortThreshold);
+}
+
+function quickSortThreshold5(array) {
+    qSort(array, randomPivot, 0, array.length - 1, 5);
+}
+
+function quickSortThreshold10(array) {
+    qSort(array, randomPivot, 0, array.length - 1, 10);
+}
+
+function quickSortThreshold20(array) {
+    qSort(array, randomPivot, 0, array.length - 1, 20);
 }
 
 function randomPivot(array, first, last) {
     return Math.floor(Math.random() * (last - first) + first);
-}
-
-function quickSortMedian3(array) {
-    qSort(array, median3, 0, array.length - 1);
-}
-
-function quickSortMedian5(array) {
-    qSort(array, median5, 0, array.length - 1);
 }
 
 function median3(array, first, last) {
@@ -55,13 +69,18 @@ function firstAsPivot(array, first, last) {
     return first;
 }
 
-function qSort(array, pivotPicker, first, last) {
-    if (first < last) {
-        let pivot = pivotPicker(array, first, last);
-        pivot = partition(array, first, last, pivot);
-        qSort(array, pivotPicker, first, pivot - 1);
-        qSort(array, pivotPicker, pivot + 1, last);
+function qSort(array, pivotPicker, first, last, threshold) {
+    if (first > last) {
+        return;
     }
+    if (last - first <= threshold) {
+        iSort(array, first, last + 1);
+        return;
+    }
+    let pivot = pivotPicker(array, first, last);
+    pivot = partition(array, first, last, pivot);
+    qSort(array, pivotPicker, first, pivot - 1, threshold);
+    qSort(array, pivotPicker, pivot + 1, last, threshold);
 }
 
 function partition(array, first, last, pivot) {
@@ -76,5 +95,3 @@ function partition(array, first, last, pivot) {
     swap(array, last, j);
     return j;
 }
-
-
