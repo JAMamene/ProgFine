@@ -1,8 +1,9 @@
+// Mandatory array to declare the different algorithms to use
 let algorithms = [heapSort, insertionSort, mergeSort, apiSort,
     quickSortRandom, quickSortMedian3, quickSortFirst, quickSortMedian5,
-    smoothSort, timSort];
+    smoothSort, timSort, timSortMini];
 
-
+// Arrays to sort for the unit tests
 let tabs = [
     [1],
     [1, 2],
@@ -13,6 +14,8 @@ let tabs = [
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     [2, 3, 4, 7, 6, 10, 1, 9, 8, 5]
 ];
+
+// Arrays sorted to compare with the generated results for the unit tests
 let results = [
     [1],
     [1, 2],
@@ -24,6 +27,7 @@ let results = [
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ];
 
+// Unit testing will prompt errors in the console if any algorithm fail to sort a test array
 for (let i = 0; i < tabs.length; i++) {
     algorithms.forEach(function (func) {
         let tab = tabs[i].slice();
