@@ -1,6 +1,6 @@
 // Mandatory array to declare the different algorithms to use
 let algorithms = [heapSort, insertionSort, mergeSort, apiSort,
-    quickSortRandom, quickSortMedian3, quickSortFirst, quickSortMedian5,
+    quickSortRandom, quickSortFirst, quickSortMedian3, quickSortMedian5,
     quickSortThreshold5, quickSortThreshold10, quickSortThreshold20,
     smoothSort, timSort, timSortMini];
 

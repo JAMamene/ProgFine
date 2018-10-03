@@ -40,7 +40,7 @@ function sortedDescend(size) {
  */
 function pseudoSorted(size) {
     let arr = Array.from({length: size}, (v, k) => k);
-    for (let i = 0; i < Math.floor(size / 8); i++) {
+    for (let i = 0; i < Math.floor(size / 4); i++) {
         swap(arr, Math.floor(Math.random() * (size - 1)), Math.floor((Math.random() * (size - 1))));
     }
     return arr;
@@ -51,5 +51,5 @@ function pseudoSorted(size) {
  * @param size
  */
 function lottaSameValue(size) {
-    return Array.from({length: size}, () => Math.floor(Math.random() * 128));
+    return Array.from({length: size}, () => Math.floor(Math.random() * 64));
 }

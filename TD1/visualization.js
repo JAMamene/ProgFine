@@ -65,10 +65,10 @@ function measureTimes(alg, entrySize, iterations, maxMillis, arGenAlg) {
  */
 function runBench(arGenAlg, selectedAlgs, iterations, bailoutTime) {
     // The different tab size to experiment on
-    let ns = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+    let ns = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
     let bailoutTimeMS = bailoutTime;
     // The number of ignored ns (the x first one), reason is for warmup and because time of small tabs arre inconsistent
-    let warmupOffset = 5;
+    let warmupOffset = 7;
     // The values for the scatterChart
     let valuesScatter = new Array(ns.length - warmupOffset);
     // The candleChart array
