@@ -1,7 +1,7 @@
 var arGenAlgos = [randomGen, randomGenBigNumber, sortedAscend, sortedDescend, pseudoSorted, lottaSameValue];
 
 $(function () {
-    // Not really functional
+    //Convert numbers in log2 to the real values
 //     $('#real').click(function () {
 //         $('text').each(function () {
 //             let text = $(this).text();
@@ -11,6 +11,8 @@ $(function () {
 //         });
 //     });
 
+
+    //Generate the form content in the main page
     let options = [];
     let src = new Array(arGenAlgos.length);
     for (let i = 0; i < arGenAlgos.length; i++) {
