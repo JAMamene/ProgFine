@@ -53,3 +53,21 @@ function pseudoSorted(size) {
 function lottaSameValue(size) {
     return Array.from({length: size}, () => Math.floor(Math.random() * 64));
 }
+
+
+function medianof3LUL(size) {
+    let array = Array.from({length: size}, (v, k) => k);
+    let p = Array.from({length: size}, (v, k) => k);
+    let i = 0;
+    for (; i < array.length; i += 2) {
+        let iPivot0 = i;
+        let iPivot1 = Math.floor((i + array.length - 1) / 2);
+        array[p[iPivot1]] = i + 1;
+        array[p[iPivot0]] = i;
+        swap(p, iPivot1, i + 1);
+    }
+    if (array.length > 0 && i === array.length) {
+        array[array.length - 1] = i - 1;
+    }
+    return array;
+}

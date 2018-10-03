@@ -1,4 +1,4 @@
-var arGenAlgos = [randomGen, randomGenBigNumber, sortedAscend, sortedDescend, pseudoSorted, lottaSameValue];
+var arGenAlgos = [randomGen, randomGenBigNumber, sortedAscend, sortedDescend, pseudoSorted, lottaSameValue, medianof3LUL];
 
 $(function () {
     //Convert numbers in log2 to the real values
