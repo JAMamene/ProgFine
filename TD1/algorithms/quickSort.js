@@ -10,12 +10,35 @@ function quickSortMedian3(array) {
     qSort(array, median3, 0, array.length - 1);
 }
 
+function quickSortMedian5(array) {
+    qSort(array, median5, 0, array.length - 1);
+}
+
 function median3(array, first, last) {
     let middle = Math.floor((first + last) / 2);
     swapIfSmaller(array, last, first);
     swapIfSmaller(array, middle, first);
     swapIfSmaller(array, last, middle);
     return middle;
+}
+
+function median5(array, first, last) {
+    let middle = Math.floor((first + last) / 2);
+    let left = Math.floor((first + middle) / 2);
+    let right = Math.floor((middle + last) / 2);
+    swapIfSmaller(array, left, first);
+    swapIfSmaller(array, right, middle);
+    if (array[middle] < array[first]) {
+        swap(array, left, right);
+        swap(array, middle, first);
+    }
+    swap(array, first, last);
+    swapIfSmaller(array, left, first);
+    if (array[first] < array[middle]) {
+        swap(array, left, right);
+        swap(array, first, middle);
+    }
+    return array[first] < array[right] ? first : right;
 }
 
 function swapIfSmaller(array, a, b) {
@@ -54,5 +77,4 @@ function partition(array, first, last, pivot) {
     return j;
 }
 
-// median de 3, 4, 5, 1er élément
 
