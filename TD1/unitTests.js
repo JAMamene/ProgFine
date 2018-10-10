@@ -1,7 +1,7 @@
 // Mandatory array to declare the different algorithms to use
 let algorithms = [heapSort, insertionSort, mergeSort, apiSort,
     quickSortRandom, quickSortFirst, quickSortMedian3, quickSortMedian5,
-    quickSortThreshold5, quickSortThreshold10, quickSortThreshold20,
+    quickSortThreshold5, quickSortThreshold10, quickSortThreshold20, quickSortThreshold50,
     smoothSort, timSort, timSortMini];
 
 // Arrays to sort for the unit tests

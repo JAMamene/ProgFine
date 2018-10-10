@@ -24,6 +24,10 @@ function quickSortThreshold20(array) {
     qSort(array, randomPivot, 0, array.length - 1, 20);
 }
 
+function quickSortThreshold50(array) {
+    qSort(array, randomPivot, 0, array.length - 1, 50);
+}
+
 function randomPivot(array, first, last) {
     return Math.floor(Math.random() * (last - first) + first);
 }

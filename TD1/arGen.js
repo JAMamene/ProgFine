@@ -55,7 +55,7 @@ function lottaSameValue(size) {
 }
 
 
-function medianof3LUL(size) {
+function medianof3adversary(size) {
     let array = Array.from({length: size}, (v, k) => k);
     let p = Array.from({length: size}, (v, k) => k);
     let i = 0;
