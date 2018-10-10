@@ -30,17 +30,26 @@ $(function () {
 function measureTimes(alg, entrySize, iterations, maxMillis, arGenAlg) {
     let times = new Array(iterations);
     let oneChance = true;
+
+    // Run the number of iterations wanted
     for (let i = 0; i < iterations; i++) {
         let arr = arGenAlg(entrySize);
+
+        // Timer start
         let t0 = performance.now();
         try {
             alg(arr);
         }
+        // In case of stackOverflow or other error return null to signify the execution failed
         catch (e) {
             console.log(e);
             return null;
         }
+
+        // Timer stop
         let t1 = performance.now();
+
+        // If exec time was too long and the chance was used then return null
         if ((t1 - t0) > maxMillis) {
             if (oneChance) {
                 console.log(alg.name + " WARNING at " + entrySize);
@@ -51,6 +60,7 @@ function measureTimes(alg, entrySize, iterations, maxMillis, arGenAlg) {
                 return null;
             }
         }
+        // Return time as Nanoseconds to prevent negative values for the logarithm
         times[i] = (t1 - t0) * 1000;
     }
     return times;
