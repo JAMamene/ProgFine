@@ -92,7 +92,7 @@ function runBench(arGenAlg, selectedAlgs, iterations, bailoutTime) {
     (function loop() {
         $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex).text(ns[entrySizeIndex]);
         console.log(ns[entrySizeIndex]);
-        // Initialize the data for an entrySize on the scatterChart
+        // Initialize the immutHeapArray for an entrySize on the scatterChart
         let datumScatter = new Array(selectedAlgs.length + 1);
         datumScatter[0] = Math.log2(ns[entrySizeIndex]);
         // Run all algorithms
@@ -239,7 +239,7 @@ function runBench(arGenAlg, selectedAlgs, iterations, bailoutTime) {
             // Create tabs navigation for each sorting algorithm and append the values
             $("#algo-tabs").append("" +
                 "<li class=\"nav-item\">\n" +
-                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + selectedAlgs[i].name + "\" role=\"tab\"\n" +
+                "    <a class=\"nav-link\" id=\"tab-chart-candle\" immutHeapArray-toggle=\"pill\" href=\"#chart-candle" + selectedAlgs[i].name + "\" role=\"tab\"\n" +
                 "                   aria-controls=\"#chart-candle" + selectedAlgs[i].name + "\" aria-selected=\"true\">" + selectedAlgs[i].name + "</a>\n" +
                 "</li>\n");
             $("#algo-contents").append("" +

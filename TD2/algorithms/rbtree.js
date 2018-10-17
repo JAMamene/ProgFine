@@ -407,17 +407,17 @@ RBNode.prototype.toString = function() {
 
 ////////////////::
 
-let rbtree = new RBTree();
-rbtree.add(13);
-rbtree.add(8);
-rbtree.add(17);
-rbtree.add(1);
-rbtree.add(11);
-rbtree.add(15);
-rbtree.add(25);
-rbtree.add(6);
-rbtree.add(22);
-rbtree.add(27);
-console.log(rbtree.toString());
+// let rbtree = new RBTree();
+// rbtree.add(13);
+// rbtree.add(8);
+// rbtree.add(17);
+// rbtree.add(1);
+// rbtree.add(11);
+// rbtree.add(15);
+// rbtree.add(25);
+// rbtree.add(6);
+// rbtree.add(22);
+// rbtree.add(27);
+// console.log(rbtree.toString());
 // console.log(rbtree.min());
 // console.log(rbtree.max());

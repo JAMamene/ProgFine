@@ -21,7 +21,7 @@ Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 
 /**
  * Swap two values in an array
- * @param array to swap in
+ * @param array to _swap in
  * @param i index of value 1
  * @param j index of value 2
  */

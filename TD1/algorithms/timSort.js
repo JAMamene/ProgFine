@@ -105,7 +105,7 @@ var reverse = function (array, first, last) {
     }
 };
 
-// swap array elements
+// _swap array elements
 var swap = function (array, a, b) {
     var tmp = array[a];
     array[a] = array[b];

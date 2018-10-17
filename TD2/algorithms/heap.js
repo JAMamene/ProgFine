@@ -1,15 +1,15 @@
+////////
+// Mutable MinHeap with Array
+///////
+
 function MinHeap() {
     this.data = [];
 }
 
 MinHeap.prototype.insert = function (val) {
     this.data.push(val);
-    this.bubbleUp(this.data.length - 1);
+    this._percolateUp(this.data.length - 1);
 };
-
-////////
-// Mutable MinHeap with Array
-///////
 
 MinHeap.prototype.extractMin = function () {
     let min = this.data[0];
@@ -18,25 +18,38 @@ MinHeap.prototype.extractMin = function () {
     this.data[0] = this.data.pop();
 
     // call bubble down
-    this.bubbleDown(0);
+    this._percolateDown(0);
 
     return min;
 };
 
-MinHeap.prototype.bubbleUp = function (index) {
+MinHeap.prototype.construct = function (array) {
+    this.data = array;
+    let piv = Math.floor(this.data.length / 2) - 1;
+    for (let i = piv; i >= 0; i--) {
+        this._percolateDown(i);
+    }
+};
+
+MinHeap.prototype.toString = function () {
+    return this.data;
+};
+
+///////// PRIVATE
+
+MinHeap.prototype._percolateUp = function (index) {
     while (index > 0) {
         let parent = Math.floor((index + 1) / 2) - 1;
 
         if (this.data[parent] > this.data[index]) {
-            // swap
-            this.swap(parent, index);
+            this._swap(parent, index);
         }
 
         index = parent;
     }
 };
 
-MinHeap.prototype.bubbleDown = function (index) {
+MinHeap.prototype._percolateDown = function (index) {
     while (true) {
         let child = (index + 1) * 2;
         let sibling = child - 1;
@@ -54,26 +67,15 @@ MinHeap.prototype.bubbleDown = function (index) {
             break;
         }
 
-        this.swap(toSwap, index);
+        this._swap(toSwap, index);
 
         index = toSwap;
     }
 };
 
-MinHeap.prototype.heapify = function (array) {
-    this.data = array;
-    let piv = Math.floor(this.data.length / 2) - 1;
-    for (let i = piv; i >= 0; i--) {
-        this.bubbleDown(i);
-    }
-};
-
-MinHeap.prototype.swap = function (i, j) {
+MinHeap.prototype._swap = function (i, j) {
     let temp = this.data[i];
     this.data[i] = this.data[j];
     this.data[j] = temp;
 };
 
-MinHeap.prototype.toString = function () {
-    return this.data;
-};
