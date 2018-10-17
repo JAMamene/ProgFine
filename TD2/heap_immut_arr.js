@@ -58,17 +58,16 @@ ImmutableMinHeap.prototype.bubbleDown = function (index) {
     }
 };
 
+MinHeap.prototype.heapify = function (array) {
+    this.data = array;
+    let piv = Math.floor(this.data.length / 2) - 1;
+    for (let i = piv; i >= 0; i--) {
+        this.bubbleDown(i);
+    }
+};
+
 ImmutableMinHeap.prototype.swap = function (i, j) {
     const firstItem = this.data[i];
     this.data[i] = this.data[j];
     this.data[j] = firstItem;
 };
-
-// let minHeap1 = new ImmutableMinHeap();
-// let minHeap2 = minHeap1.insert(1);
-// let minHeap3 = minHeap2.insert(3);
-// let minHeap4 = minHeap3.insert(2);
-// console.log(minHeap4.extractMin());
-// console.log(minHeap1);
-// console.log(minHeap2);
-// console.log(minHeap3);

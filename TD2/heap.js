@@ -60,8 +60,20 @@ MinHeap.prototype.bubbleDown = function (index) {
     }
 };
 
+MinHeap.prototype.heapify = function (array) {
+    this.data = array;
+    let piv = Math.floor(this.data.length / 2) - 1;
+    for (let i = piv; i >= 0; i--) {
+        this.bubbleDown(i);
+    }
+};
+
 MinHeap.prototype.swap = function (i, j) {
     let temp = this.data[i];
     this.data[i] = this.data[j];
     this.data[j] = temp;
+};
+
+MinHeap.prototype.toString = function () {
+    return this.data;
 };
