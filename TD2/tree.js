@@ -1,164 +1,148 @@
-// AVLTree ///////////////////////////////////////////////////////////////////
-//   This file is originally from the Concentré XML project (version 0.2.1)
-//   Licensed under GPL and LGPL
-//
-//   Modified by Jeremy Stephens.
-
-// Pass in the attribute you want to use for comparing
-function AVLTree(n, attr) {
-    this.init(n, attr);
-}
-
-AVLTree.prototype.init = function (n, attr) {
-    this.attr = attr;
+function AVLTree(n) {
     this.left = null;
     this.right = null;
-    this.node = n;
-    this.depth = 1;
-    this.elements = [n];
-};
+    this.val = n;
+    this.height = 1;
+}
 
-AVLTree.prototype.balance = function () {
-    let ldepth = this.left == null ? 0 : this.left.depth;
-    let rdepth = this.right == null ? 0 : this.right.depth;
+function arrayToTree(array) {
+    array.sort((a, b) => {
+        return a - b
+    });
+    console.log(array);
+    return arrToTree(array, 0, array.length - 1);
+}
 
-    if (ldepth > rdepth + 1) {
-        // LR or LL rotation
-        let lldepth = this.left.left == null ? 0 : this.left.left.depth;
-        let lrdepth = this.left.right == null ? 0 : this.left.right.depth;
+function arrToTree(array, start, end) {
+    if (start > end) return null;
+    let middle = start + Math.floor((end - start) / 2);
+    console.log("Mid:" + middle);
+    let tree = new AVLTree(array[middle]);
+    tree.left = arrToTree(array, start, middle - 1);
+    tree.right = arrToTree(array, middle + 1, end);
+    tree.height = Math.max(height(tree.left), height(tree.right)) + 1;
+    return tree;
+}
 
-        if (lldepth < lrdepth) {
-            // LR rotation consists of a RR rotation of the left child
-            this.left.rotateRR();
-            // plus a LL rotation of this node, which happens anyway
+AVLTree.prototype.insert = function (n) {
+    if (n === this.val) return;
+    if (n < this.val) {
+        if (this.left === null) {
+            this.left = new AVLTree(n);
+        } else {
+            this.left.insert(n);
         }
-        this.rotateLL();
-    } else if (ldepth + 1 < rdepth) {
-        // RR or RL rotation
-        let rrdepth = this.right.right == null ? 0 : this.right.right.depth;
-        let rldepth = this.right.left == null ? 0 : this.right.left.depth;
-
-        if (rldepth > rrdepth) {
-            // RR rotation consists of a LL rotation of the right child
-            this.right.rotateLL();
-            // plus a RR rotation of this node, which happens anyway
+    } else {
+        if (this.right === null) {
+            this.right = new AVLTree(n);
+        } else {
+            this.right.insert(n);
         }
-        this.rotateRR();
+    }
+    let lh = height(this.left);
+    let rh = height(this.right);
+    this.height = Math.max(lh, rh) + 1;
+    let balance = lh - rh;
+    if (balance > 1 && n < this.left.val) {
+        this.rotateRight();
+    }
+    if (balance < -1 && n > this.right.val) {
+        this.rotateLeft();
+    }
+    if (balance > 1 && n > this.left.val) {
+        this.left = this.left.rotateLeft();
+        this.rotateRight();
+    }
+    if (balance < -1 && n < this.right.val) {
+        this.right = this.right.rotateRight();
+        this.rotateLeft();
     }
 };
 
-AVLTree.prototype.rotateLL = function () {
-    // the left side is too long => rotate from the left (_not_ leftwards)
-    let nodeBefore = this.node;
-    let elementsBefore = this.elements;
-    let rightBefore = this.right;
-    this.node = this.left.node;
-    this.elements = this.left.elements;
-    this.right = this.left;
-    this.left = this.left.left;
-    this.right.left = this.right.right;
-    this.right.right = rightBefore;
-    this.right.node = nodeBefore;
-    this.right.elements = elementsBefore;
-    this.right.updateInNewLocation();
-    this.updateInNewLocation();
-};
-
-AVLTree.prototype.rotateRR = function () {
-    // the right side is too long => rotate from the right (_not_ rightwards)
-    let nodeBefore = this.node;
-    let elementsBefore = this.elements;
-    let leftBefore = this.left;
-    this.node = this.right.node;
-    this.elements = this.right.elements;
-    this.left = this.right;
-    this.right = this.right.right;
-    this.left.right = this.left.left;
-    this.left.left = leftBefore;
-    this.left.node = nodeBefore;
-    this.left.elements = elementsBefore;
-    this.left.updateInNewLocation();
-    this.updateInNewLocation();
-};
-
-AVLTree.prototype.updateInNewLocation = function () {
-    this.getDepthFromChildren();
-};
-
-AVLTree.prototype.getDepthFromChildren = function () {
-    this.depth = this.node == null ? 0 : 1;
-    if (this.left != null) {
-        this.depth = this.left.depth + 1;
-    }
-    if (this.right != null && this.depth <= this.right.depth) {
-        this.depth = this.right.depth + 1;
-    }
-};
-
-AVLTree.prototype.compare = function (n1, n2) {
-    let v1 = n1[this.attr];
-    let v2 = n2[this.attr];
-    if (v1 === v2) {
+function height(x) {
+    if (x === null) {
         return 0;
     }
-    if (v1 < v2) {
-        return -1;
-    }
-    return 1;
+    return x.height;
+}
+
+AVLTree.prototype.rotateRight = function () {
+    let x = this.left;
+    let t = this.right;
+    x.right = this;
+    this.left = t;
+    this.height = Math.max(height(this.left), height(this.right)) + 1;
+    x.height = Math.max(height(x.left), height(x.right)) + 1;
+    return x;
 };
 
-AVLTree.prototype.add = function (n) {
-    let o = this.compare(n, this.node);
-    if (o === 0) {
-        this.elements.push(n);
-        return false;
-    }
-
-    let ret = false;
-    if (o === -1) {
-        if (this.left == null) {
-            this.left = new AVLTree(n, this.attr);
-            ret = true;
-        } else {
-            ret = this.left.add(n);
-            if (ret) {
-                this.balance();
-            }
-        }
-    } else if (o === 1) {
-        if (this.right == null) {
-            this.right = new AVLTree(n, this.attr);
-            ret = true;
-        } else {
-            ret = this.right.add(n);
-            if (ret) {
-                this.balance();
-            }
-        }
-    }
-
-    if (ret) {
-        this.getDepthFromChildren();
-    }
-    return ret;
+AVLTree.prototype.rotateLeft = function () {
+    // noinspection JSSuspiciousNameCombination
+    let y = this.right;
+    let t = y.left;
+    y.left = this;
+    this.right = t;
+    this.height = Math.max(height(this.left), height(this.right)) + 1;
+    y.height = Math.max(height(y.left), height(y.right)) + 1;
+    // noinspection JSSuspiciousNameCombination
+    return y;
 };
 
-// Given the beginning of a value, return the elements if there's a match
-AVLTree.prototype.findBest = function (value) {
-    let substr = this.node[this.attr].substr(0, value.length).toLowerCase();
-    value = value.toLowerCase();
+AVLTree.prototype.remove = function (n) {
+    if (n < this.val) {
+        this.left = this.left.remove(n);
+    } else if (n > this.val) {
+        this.right = this.right.remove(n);
+    } else {
+        if (this.left === null && this.right === null) {
+            return null;
+        }
+        if (this.left === null || this.right === null) {
+            let tmp;
+            if (this.left !== null) {
+                tmp = this.left;
+            } else {
+                tmp = this.right;
+            }
+            this.left = tmp.left;
+            this.right = tmp.right;
+            this.val = tmp.val;
+            this.height = tmp.height;
+        } else {
+            let tmp = this.right.minValueNode();
+            this.left = tmp.left;
+            this.right = tmp.right;
+            this.val = tmp.val;
+            this.height = tmp.height;
+            this.right = this.right.remove(n);
+        }
+    }
+    this.height = Math.max(height(this.left), height(this.right)) + 1;
+    let balance = getBalance(this);
+    if (balance > 1 && getBalance(this.left) >= 0) {
+        return this.rotateRight();
+    } else if (balance > 1) {
+        this.left = this.left.rotateLeft();
+        return this.rotateRight();
+    }
+    if (balance < -1 && getBalance(this.right) <= 0) {
+        return this.rotateLeft();
+    } else if (balance < -1) {
+        this.right = this.right.rotateRight();
+        return this.rotateLeft();
+    }
+    return this;
+};
 
-    if (value < substr) {
-        if (this.left != null) {
-            return this.left.findBest(value);
-        }
-        return [];
+function getBalance(node) {
+    if (node === null) return 0;
+    return height(node.left) - height(node.right);
+}
+
+AVLTree.prototype.minValueNode = function () {
+    let tmp = this;
+    while (tmp.left !== null) {
+        tmp = tmp.left;
     }
-    else if (value > substr) {
-        if (this.right != null) {
-            return this.right.findBest(value);
-        }
-        return [];
-    }
-    return this.elements;
+    return tmp;
 };
