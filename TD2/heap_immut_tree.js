@@ -149,27 +149,6 @@ MinHeap_Immut_Tree.prototype.bubbleDown = function () {
         node = this.swapDown(old, node, toSwap);
         old = toSwap;
     }
-    // while (true) {
-    //     let child = (index + 1) * 2;
-    //     let sibling = child - 1;
-    //     let toSwap = null;
-    //
-    //     if (this.data[index] > this.data[child]) {
-    //         toSwap = child;
-    //     }
-    //
-    //     if (this.data[index] > this.data[sibling] && (this.data[child] == null || (this.data[child] !== null && this.data[sibling] < this.data[child]))) {
-    //         toSwap = sibling;
-    //     }
-    //
-    //     if (toSwap == null) {
-    //         break;
-    //     }
-    //
-    //     this.swap(toSwap, index);
-    //
-    //     index = toSwap;
-    // }
 };
 
 //TODO
@@ -272,23 +251,21 @@ MinHeap_Immut_Tree.prototype.toString = function () {
     return lines.join("\n");
 };
 
-let heap = new MinHeap_Immut_Tree();
-heap.insert(2);
-heap.insert(3);
-heap.insert(4);
-console.log(heap.toString());
-heap.insert(1);
-console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-
-
+// let heap = new MinHeap_Immut_Tree();
+// heap.insert(2);
+// heap.insert(3);
+// heap.insert(4);
+// console.log(heap.toString());
+// heap.insert(1);
+// console.log(heap.toString());
+// console.log(heap.extractMin());
+// console.log(heap.toString());
+// console.log(heap.extractMin());
+// console.log(heap.toString());
+// console.log(heap.extractMin());
+// console.log(heap.toString());
+// console.log(heap.extractMin());
+// console.log(heap.toString());
 // bench
 // heapify
 // Suppression (sans compter ajout)
