@@ -9,14 +9,12 @@ function arrayToTree(array) {
     array.sort((a, b) => {
         return a - b
     });
-    console.log(array);
     return arrToTree(array, 0, array.length - 1);
 }
 
 function arrToTree(array, start, end) {
     if (start > end) return null;
     let middle = start + Math.floor((end - start) / 2);
-    console.log("Mid:" + middle);
     let tree = new AVLTree(array[middle]);
     tree.left = arrToTree(array, start, middle - 1);
     tree.right = arrToTree(array, middle + 1, end);
