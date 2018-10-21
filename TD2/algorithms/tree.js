@@ -27,38 +27,42 @@ AVLTree.prototype._arrToTree = function (array, start, end) {
 };
 
 AVLTree.prototype.insert = function (n) {
-    if (n === this.val) return;
+    if (this.val === null) {
+        this.val = n;
+        this.height = 1;
+        return this;
+    }
+    if (n === this.val) return this;
     if (n < this.val) {
         if (this.left === null) {
-            this.left = new AVLTree(n);
-        } else {
-            this.left.insert(n);
+            this.left = new AVLTree();
         }
+        this.left = this.left.insert(n);
     } else {
         if (this.right === null) {
-            this.right = new AVLTree(n);
-        } else {
-            this.right.insert(n);
+            this.right = new AVLTree();
         }
+        this.right = this.right.insert(n);
     }
     let lh = height(this.left);
     let rh = height(this.right);
     this.height = Math.max(lh, rh) + 1;
     let balance = lh - rh;
     if (balance > 1 && n < this.left.val) {
-        this._rotateRight();
+        return this._rotateRight();
     }
     if (balance < -1 && n > this.right.val) {
-        this._rotateLeft();
+        return this._rotateLeft();
     }
     if (balance > 1 && n > this.left.val) {
         this.left = this.left._rotateLeft();
-        this._rotateRight();
+        return this._rotateRight();
     }
     if (balance < -1 && n < this.right.val) {
         this.right = this.right._rotateRight();
-        this._rotateLeft();
+        return this._rotateLeft();
     }
+    return this;
 };
 
 function height(x) {
@@ -67,6 +71,13 @@ function height(x) {
     }
     return x.height;
 }
+
+// Rotation droite :
+//           this                          x
+//           / \          ----->         /   \
+//         x  this.right            x.left   this
+//        / \                                / \
+//  x.left   t                              t   this.right
 
 AVLTree.prototype._rotateRight = function () {
     let x = this.left;
@@ -77,6 +88,13 @@ AVLTree.prototype._rotateRight = function () {
     x.height = Math.max(height(x.left), height(x.right)) + 1;
     return x;
 };
+
+// Rotation gauche :
+//        this                              y
+//        / \           ----->            /   \
+//this.left  y                          this    y.right
+//          / \                        / \
+//         t   y.right        this.left   t
 
 AVLTree.prototype._rotateLeft = function () {
     // noinspection JSSuspiciousNameCombination
@@ -156,10 +174,10 @@ AVLTree.prototype._minValueNode = function () {
 };
 
 AVLTree.prototype.toString = function () {
-    let l = this.left === null ? "null" : this.left._toString(1);
-    let r = this.right === null ? "null" : this.right._toString(1);
+    let l = this.left === null ? "   null" : this.left._toString(1);
+    let r = this.right === null ? "   null" : this.right._toString(1);
     return "Value: " + this.val + "\n" + "Height: " + this.height + "\n" +
-        "Left:\n" + l + "Right:\n" + r + "\n";
+        "Left:\n" + l + "\n" + "Right:\n" + r + "\n";
 };
 
 AVLTree.prototype._toString = function (indent) {
@@ -169,4 +187,26 @@ AVLTree.prototype._toString = function (indent) {
     let r = this.right === null ? str + "    null" : this.right._toString(indent + 1);
     return str + "Value: " + this.val + "\n" + str + "Height: " + this.height + "\n"
         + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
+};
+
+function AVLTreeWrapper() {
+    this.tree = new AVLTree();
+}
+
+AVLTreeWrapper.prototype.insert = function (val) {
+    this.tree = this.tree.insert(val);
+};
+
+AVLTreeWrapper.prototype.extractMin = function () {
+    let min = this.tree._minValueNode().val;
+    this.tree = this.tree._remove(min);
+    return min;
+};
+
+AVLTreeWrapper.prototype.construct = function (array) {
+    this.tree.construct(array);
+};
+
+AVLTreeWrapper.prototype.toString = function () {
+    return this.tree.toString();
 };
