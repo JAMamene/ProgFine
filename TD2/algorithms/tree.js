@@ -5,12 +5,12 @@ function AVLTree(n) {
     this.height = 1;
 }
 
-function arrayToTree(array) {
+AVLTree.prototype.construct = function (array) {
     array.sort((a, b) => {
         return a - b
     });
     return arrToTree(array, 0, array.length - 1);
-}
+};
 
 function arrToTree(array, start, end) {
     if (start > end) return null;
@@ -42,18 +42,18 @@ AVLTree.prototype.insert = function (n) {
     this.height = Math.max(lh, rh) + 1;
     let balance = lh - rh;
     if (balance > 1 && n < this.left.val) {
-        this.rotateRight();
+        this._rotateRight();
     }
     if (balance < -1 && n > this.right.val) {
-        this.rotateLeft();
+        this._rotateLeft();
     }
     if (balance > 1 && n > this.left.val) {
-        this.left = this.left.rotateLeft();
-        this.rotateRight();
+        this.left = this.left._rotateLeft();
+        this._rotateRight();
     }
     if (balance < -1 && n < this.right.val) {
-        this.right = this.right.rotateRight();
-        this.rotateLeft();
+        this.right = this.right._rotateRight();
+        this._rotateLeft();
     }
 };
 
@@ -64,7 +64,7 @@ function height(x) {
     return x.height;
 }
 
-AVLTree.prototype.rotateRight = function () {
+AVLTree.prototype._rotateRight = function () {
     let x = this.left;
     let t = this.right;
     x.right = this;
@@ -74,7 +74,7 @@ AVLTree.prototype.rotateRight = function () {
     return x;
 };
 
-AVLTree.prototype.rotateLeft = function () {
+AVLTree.prototype._rotateLeft = function () {
     // noinspection JSSuspiciousNameCombination
     let y = this.right;
     let t = y.left;
@@ -86,11 +86,21 @@ AVLTree.prototype.rotateLeft = function () {
     return y;
 };
 
-AVLTree.prototype.remove = function (n) {
+AVLTree.prototype.extractMin = function () {
+    let min = this._minValueNode().val;
+    console.log(this._minValueNode());
+    this._remove(min);
+    return min;
+};
+
+AVLTree.prototype._remove = function (n) {
+    if (this.left !== null) {
+        return this.left._remove();
+    }
     if (n < this.val) {
-        this.left = this.left.remove(n);
+        this.left = this.left._remove(n);
     } else if (n > this.val) {
-        this.right = this.right.remove(n);
+        this.right = this.right._remove(n);
     } else {
         if (this.left === null && this.right === null) {
             return null;
@@ -107,27 +117,27 @@ AVLTree.prototype.remove = function (n) {
             this.val = tmp.val;
             this.height = tmp.height;
         } else {
-            let tmp = this.right.minValueNode();
+            let tmp = this.right._minValueNode();
             this.left = tmp.left;
             this.right = tmp.right;
             this.val = tmp.val;
             this.height = tmp.height;
-            this.right = this.right.remove(n);
+            this.right = this.right._remove(n);
         }
     }
     this.height = Math.max(height(this.left), height(this.right)) + 1;
     let balance = getBalance(this);
     if (balance > 1 && getBalance(this.left) >= 0) {
-        return this.rotateRight();
+        return this._rotateRight();
     } else if (balance > 1) {
-        this.left = this.left.rotateLeft();
-        return this.rotateRight();
+        this.left = this.left._rotateLeft();
+        return this._rotateRight();
     }
     if (balance < -1 && getBalance(this.right) <= 0) {
-        return this.rotateLeft();
+        return this._rotateLeft();
     } else if (balance < -1) {
-        this.right = this.right.rotateRight();
-        return this.rotateLeft();
+        this.right = this.right._rotateRight();
+        return this._rotateLeft();
     }
     return this;
 };
@@ -137,10 +147,24 @@ function getBalance(node) {
     return height(node.left) - height(node.right);
 }
 
-AVLTree.prototype.minValueNode = function () {
+AVLTree.prototype._minValueNode = function () {
     let tmp = this;
     while (tmp.left !== null) {
         tmp = tmp.left;
     }
     return tmp;
+};
+
+AVLTree.prototype.toString = function () {
+    let l = this.left === null ? "null" : this.left._toString(1);
+    let r = this.right === null ? "null" : this.right._toString(1);
+    return "Value: " + this.val + "\n" + "Left:\n" + l + "Right:\n" + r + "\n";
+};
+
+AVLTree.prototype._toString = function (indent) {
+    let str = "";
+    for (let i = 0; i < indent; i++) str += "   ";
+    let l = this.left === null ? str + "    null" : this.left._toString(indent + 1);
+    let r = this.right === null ? str + "    null" : this.right._toString(indent + 1);
+    return str + "Value: " + this.val + "\n" + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
 };
