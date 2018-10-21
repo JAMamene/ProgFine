@@ -81,7 +81,7 @@ function height(x) {
 
 AVLTree.prototype._rotateRight = function () {
     let x = this.left;
-    let t = this.right;
+    let t = x.right;
     x.right = this;
     this.left = t;
     this.height = Math.max(height(this.left), height(this.right)) + 1;
@@ -106,12 +106,6 @@ AVLTree.prototype._rotateLeft = function () {
     y.height = Math.max(height(y.left), height(y.right)) + 1;
     // noinspection JSSuspiciousNameCombination
     return y;
-};
-
-AVLTree.prototype.extractMin = function () {
-    let min = this._minValueNode().val;
-    this._remove(min);
-    return min;
 };
 
 AVLTree.prototype._remove = function (n) {
@@ -195,6 +189,7 @@ function AVLTreeWrapper() {
 
 AVLTreeWrapper.prototype.insert = function (val) {
     this.tree = this.tree.insert(val);
+    //console.log(this.tree);
 };
 
 AVLTreeWrapper.prototype.extractMin = function () {
