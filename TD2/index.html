@@ -21,9 +21,38 @@
     <script type="text/javascript" src="algorithms/heap_immut_tree.js"></script>
     <script type="text/javascript" src="algorithms/tree.js"></script>
     <script type="text/javascript" src="algorithms/rbtree.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
     <script type="text/javascript" src="definitions.js"></script>
+    <script type="text/javascript" src="visualization.js"></script>
 </head>
 <body>
-    TD2 MA BOI
+<div class="container-fluid">
+    <div class="container">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100"></div>
+        </div>
+        <br/>
+        <form class="needs-validation" novalidate>
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <label for="iterations">Number of iterations per function</label>
+                    <input type="number" class="form-control" id="iterations" placeholder="64"
+                           value="64" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="bailoutTime">Number of milliseconds before bailout</label>
+                    <input type="number" class="form-control" id="bailoutTime" placeholder="32"
+                           value="32" required>
+                </div>
+            </div>
+            <br/>
+            <br/>
+            <button class="btn btn-primary" id="runBench" type="submit">Run Benchmark</button>
+        </form>
+    </div>
+    <div id="chartArea"></div>
+    <div id="footeer"></div>
+</div>
 </body>
 </html>

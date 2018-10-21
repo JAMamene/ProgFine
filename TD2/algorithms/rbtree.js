@@ -1,423 +1,245 @@
-/// RBTREE
-
-function RBTree() {
-    this._root      = null;
-    this._ancestors = [];
+function Node(data) {
+    this.data = data;
+    this.left = null;
+    this.right = null;
+    this.red = true;
 }
 
-RBTree.prototype._findNode = function(value, saveAncestors) {
-    if ( saveAncestors == null ) saveAncestors = false;
+Node.prototype.get_child = function (dir) {
+    return dir ? this.right : this.left;
+};
 
-    let result = this._root;
-
-    if ( saveAncestors ) {
-        this._ancestors = [];
+Node.prototype.set_child = function (dir, val) {
+    if (dir) {
+        this.right = val;
     }
-    
-    while ( result != null ) {
-        if ( value !== result._value ) {
-            if ( saveAncestors ) {
-                this._ancestors.push(result);
+    else {
+        this.left = val;
+    }
+};
+
+Node.prototype.toString = function () {
+    return this.data.toString().concat((this.red === true) ? " (R)" : " (B)");
+};
+
+function RBTree() {
+    this._root = null;
+    this._comparator = function (a, b) {
+        return b - a;
+    };
+    this.size = 0;
+}
+
+// returns true if inserted, false if duplicate
+RBTree.prototype.insert = function (data) {
+    let ret = false;
+
+    if (this._root === null) {
+        // empty tree
+        this._root = new Node(data);
+        ret = true;
+        this.size++;
+    }
+    else {
+        let head = new Node(undefined); // fake tree root
+
+        let dir = 0;
+        let last = 0;
+
+        // setup
+        let gp = null; // grandparent
+        let ggp = head; // grand-grand-parent
+        let p = null; // parent
+        let node = this._root;
+        ggp.right = this._root;
+
+        // search down
+        while (true) {
+            if (node === null) {
+                // insert new node at the bottom
+                node = new Node(data);
+                p.set_child(dir, node);
+                ret = true;
+                this.size++;
             }
-            if ( value < result._value ) {
-                result = result._left;
-            } else {
-                result = result._right;
+            else if (this.is_red(node.left) && this.is_red(node.right)) {
+                // color flip
+                node.red = true;
+                node.left.red = false;
+                node.right.red = false;
             }
-        } else {
-            break;
+
+            // fix red violation
+            if (this.is_red(node) && this.is_red(p)) {
+                let dir2 = ggp.right === gp;
+
+                if (node === p.get_child(last)) {
+                    ggp.set_child(dir2, this._single_rotate(gp, !last));
+                }
+                else {
+                    ggp.set_child(dir2, this._double_rotate(gp, !last));
+                }
+            }
+
+            let cmp = this._comparator(node.data, data);
+
+            // stop if found
+            if (cmp === 0) {
+                break;
+            }
+
+            last = dir;
+            dir = cmp < 0;
+
+            // update helpers
+            if (gp !== null) {
+                ggp = gp;
+            }
+            gp = p;
+            p = node;
+            node = node.get_child(dir);
+        }
+
+        // update root
+        this._root = head.right;
+    }
+
+    // make root black
+    this._root.red = false;
+
+    return ret;
+};
+
+// returns true if removed, false if not found
+RBTree.prototype.remove = function (data) {
+    if (this._root === null) {
+        return false;
+    }
+
+    let head = new Node(undefined); // fake tree root
+    let node = head;
+    node.right = this._root;
+    let p = null; // parent
+    let gp = null; // grand parent
+    let found = null; // found item
+    let dir = 1;
+
+    while (node.get_child(dir) !== null) {
+        let last = dir;
+
+        // update helpers
+        gp = p;
+        p = node;
+        node = node.get_child(dir);
+
+        let cmp = this._comparator(data, node.data);
+
+        dir = cmp > 0;
+
+        // save found node
+        if (cmp === 0) {
+            found = node;
+        }
+
+        // push the red node down
+        if (!this.is_red(node) && !this.is_red(node.get_child(dir))) {
+            if (this.is_red(node.get_child(!dir))) {
+                let sr = this._single_rotate(node, dir);
+                p.set_child(last, sr);
+                p = sr;
+            }
+            else if (!this.is_red(node.get_child(!dir))) {
+                let sibling = p.get_child(!last);
+                if (sibling !== null) {
+                    if (!this.is_red(sibling.get_child(!last)) && !this.is_red(sibling.get_child(last))) {
+                        // color flip
+                        p.red = false;
+                        sibling.red = true;
+                        node.red = true;
+                    }
+                    else {
+                        let dir2 = gp.right === p;
+
+                        if (this.is_red(sibling.get_child(last))) {
+                            gp.set_child(dir2, this._double_rotate(p, last));
+                        }
+                        else if (this.is_red(sibling.get_child(!last))) {
+                            gp.set_child(dir2, this._single_rotate(p, last));
+                        }
+
+                        // ensure correct coloring
+                        let gpc = gp.get_child(dir2);
+                        gpc.red = true;
+                        node.red = true;
+                        gpc.left.red = false;
+                        gpc.right.red = false;
+                    }
+                }
+            }
         }
     }
 
-    return result;
-};
-
-
-RBTree.prototype._maxNode = function(node, saveAncestors) {
-    if ( node == null ) node = this._root;
-    if ( saveAncestors == null ) saveAncestors = false;
-
-    if ( node != null ) {
-        while ( node._right != null ) {
-            if ( saveAncestors ) {
-                this._ancestors.push(node);
-            }
-            node = node._right;
-        }
+    // replace and remove if found
+    if (found !== null) {
+        found.data = node.data;
+        p.set_child(p.right === node, node.get_child(node.left === null));
+        this.size--;
     }
 
-    return node;
-};
-
-RBTree.prototype._minNode = function(node, saveAncestors) {
-    if ( node == null ) node = this._root;
-    if ( saveAncestors == null ) saveAncestors = false;
-
-    if ( node != null ) {
-        while ( node._left != null ) {
-            if ( saveAncestors ) {
-                this._ancestors.push(node);
-            }
-            node = node._left;
-        }
+    // update root and make it black
+    this._root = head.right;
+    if (this._root !== null) {
+        this._root.red = false;
     }
 
-    return node;
+    return found !== null;
 };
 
-RBTree.prototype._nextNode = function(node) {
-    if ( node != null ) {
-        if ( node._right != null ) {
-            this._ancestors.push(node);
-            node = this._minNode(node._right, true);
-        } else {
-            let ancestors = this._ancestors;
-            let parent = ancestors.pop();
-            
-            while ( parent != null && parent._right === node ) {
-                node = parent;
-                parent = ancestors.pop();
-            }
-
-            node = parent;
-        }
-    } else {
-        this._ancestors = [];
-        node = this._minNode(this._root, true);
-    }
-
-    return node;
-};
-
-RBTree.prototype._previousNode = function(node) {
-    if ( node != null ) {
-        if ( node._left != null ) {
-            this._ancestors.push(node);
-            node = this._maxNode(node._left, true);
-        } else {
-            let ancestors = this._ancestors;
-            let parent = ancestors.pop();
-            
-            while ( parent != null && parent._left === node ) {
-                node = parent;
-                parent = ancestors.pop();
-            }
-
-            node = parent;
-        }
-    } else {
-        this._ancestors = [];
-        node = this._maxNode(this._root, true);
-    }
-
-    return node;
-};
-
-RBTree.prototype.add = function(value) {
-    let result;
-    
-    if ( this._root == null ) {
-        result = this._root = new RBNode(value);
-    } else {
-        let addResult = this._root.add(value);
-
-        this._root = addResult[0];
-        result = addResult[1];
-    }
-
-    return result;
-};
-
-RBTree.prototype.find = function(value) {
-    let node = this._findNode(value);
-    
-    return ( node != null ) ? node._value : null;
-};
-
-RBTree.prototype.findNext = function(value) {
-    let current = this._findNode(value, true);
-
-    current = this._nextNode(current);
-
-    return (current != null ) ? current._value : null;
-};
-
-RBTree.prototype.findPrevious = function(value) {
-    let current = this._findNode(value, true);
-
-    current = this._previousNode(current);
-
-    return (current != null ) ? current._value : null;
-};
-
-RBTree.prototype.max = function() {
-    let result = this._maxNode();
-
-    return ( result != null ) ? result._value : null;
-};
-
-RBTree.prototype.min = function() {
-    let result = this._minNode();
-
-    return ( result != null ) ? result._value : null;
-};
-
-RBTree.prototype.remove = function(value) {
-    let result;
-
-    if ( this._root != null ) {
-        let remResult = this._root.remove(value);
-
-        this._root = remResult[0];
-        result = remResult[1];
-    } else {
-        result = null;
-    }
-
-    return result;
-};
-
-RBTree.prototype.traverse = function(func) {
-    if ( this._root != null ) {
-        this._root.traverse(func);
-    }
-};
-
-RBTree.prototype.toString = function() {
+RBTree.prototype.toString = function () {
     let lines = [];
 
-    if ( this._root != null ) {
+    if (this._root != null) {
         let indentText = "  ";
         let stack = [[this._root, 0, "^"]];
 
-        while ( stack.length > 0 ) {
+        while (stack.length > 0) {
             let current = stack.pop();
-            let node    = current[0];
-            let indent  = current[1];
-            let line    = "";
+            let node = current[0];
+            let indent = current[1];
+            let line = "";
 
-            for ( let i = 0; i < indent; i++ ) {
+            for (let i = 0; i < indent; i++) {
                 line += indentText;
             }
 
             line += current[2] + "(" + node.toString() + ")";
             lines.push(line);
 
-            if ( node._right != null ) stack.push([node._right, indent+1, "R"]);
-            if ( node._left  != null ) stack.push([node._left,  indent+1, "L"]);
+            if (node.get_child(true) != null) stack.push([node.get_child(true), indent + 1, "R"]);
+            if (node.get_child(false) != null) stack.push([node.get_child(false), indent + 1, "L"]);
         }
     }
 
     return lines.join("\n");
 };
 
-////// NODE
-
-function RBNode(value) {
-    this._left   = null;
-    this._right  = null;
-    this._value  = value;
-    this._height = 1;
-}
-
-RBNode.prototype.add = function(value) {
-    let addResult;
-    let result;
-    let newNode;
-
-    if ( value !== this.value ) {
-        if ( value < this._value ) {
-            if ( this._left != null ) {
-                addResult = this._left.add(value);
-                this._left = addResult[0];
-                newNode = addResult[1];
-            } else {
-                newNode = this._left = new RBNode(value);
-            }
-        } else if ( value > this._value ) {
-            if ( this._right != null ) {
-                addResult = this._right.add(value);
-                this._right = addResult[0];
-                newNode = addResult[1];
-            } else {
-                newNode = this._right = new RBNode(value);
-            }
-        }
-        result = [this.balanceTree(), newNode];
-    } else {
-        result = [this, this];
-    }
-
-    return result;
+RBTree.prototype.is_red = function (node) {
+    return node !== null && node.red;
 };
 
-RBNode.prototype.balanceTree = function() {
-    let leftHeight = (this._left != null) ? this._left._height : 0;
-    let rightHeight = (this._right != null) ? this._right._height : 0;
-    let result;
+RBTree.prototype._single_rotate = function (root, dir) {
+    let save = root.get_child(!dir);
 
-    if (leftHeight > rightHeight + 1) {
-        result = this.swingRight();
-    } else if (rightHeight > leftHeight + 1) {
-        result = this.swingLeft();
-    } else {
-        this.setHeight();
-        result = this;
-    }
+    root.set_child(!dir, save.get_child(dir));
+    save.set_child(dir, root);
 
-    return result;
+    root.red = true;
+    save.red = false;
+
+    return save;
 };
 
-RBNode.prototype.join = function(that) {
-    let result;
-
-    if ( that == null ) {
-        result = this;
-    } else {
-        let top;
-
-        if ( this._height > that._height ) {
-            top = this;
-            top._right = that.join(top._right);
-        } else {
-            top = that;
-            top._left = this.join(top._left);
-        }
-
-        result = top.balanceTree();
-    }
-
-    return result;
+RBTree.prototype._double_rotate = function (root, dir) {
+    root.set_child(!dir, this._single_rotate(root.get_child(!dir), !dir));
+    return this._single_rotate(root, dir);
 };
-
-RBNode.prototype.moveLeft = function() {
-    let right = this._right;
-    this._right = right._left;
-    right._left = this;
-    this.setHeight();
-    right.setHeight();
-
-    return right;
-};
-
-RBNode.prototype.moveRight = function() {
-    let left = this._left;
-    this._left = left._right;
-    left._right = this;
-    this.setHeight();
-    left.setHeight();
-
-    return left;
-};
-
-RBNode.prototype.remove = function(value) {
-    let remResult;
-    let result;
-    let remNode;
-
-    if ( value !== this._value ) {
-        if ( value < this._value ) {
-            if ( this._left != null ) {
-                remResult = this._left.remove(value);
-                this._left = remResult[0];
-                remNode = remResult[1];
-            } else {
-                remNode = null;
-            }
-        } else {
-            if ( this._right != null ) {
-                remResult = this._right.remove(value);
-                this._right = remResult[0];
-                remNode = remResult[1];
-            } else {
-                remNode = null;
-            }
-        }
-
-        result = this;
-    } else {
-        remNode = this;
-
-        if ( this._left == null ) {
-            result = this._right;
-        } else if ( this._right == null ) {
-            result = this._left;
-        } else {
-            result = this._left.join(this._right);
-            this._left = null;
-            this._right = null;
-        }
-    }
-
-    if ( remNode != null ) {
-        if ( result != null ) {
-            return [result.balanceTree(), remNode];
-        } else {
-            return [result, remNode];
-        }
-    } else {
-        return [this, null];
-    }
-};
-
-RBNode.prototype.setHeight = function() {
-    let leftHeight  = (this._left  != null) ? this._left._height  : 0;
-    let rightHeight = (this._right != null) ? this._right._height : 0;
-
-    this._height = (leftHeight < rightHeight) ? rightHeight + 1 : leftHeight + 1;
-};
-
-RBNode.prototype.swingLeft = function() {
-    let right      = this._right;
-    let rightLeft  = right._left;
-    let rightRight = right._right;
-    let rightLeftHeight  = (rightLeft  != null ) ? rightLeft._height  : 0;
-    let rightRightHeight = (rightRight != null ) ? rightRight._height : 0;
-
-    if ( rightLeftHeight > rightRightHeight ) {
-        this._right = right.moveRight();
-    }
-
-    return this.moveLeft();
-};
-
-RBNode.prototype.swingRight = function() {
-    let left      = this._left;
-    let leftRight = left._right;
-    let leftLeft  = left._left;
-    let leftRightHeight = (leftRight != null ) ? leftRight._height : 0;
-    let leftLeftHeight  = (leftLeft  != null ) ? leftLeft._height  : 0;
-
-    if ( leftRightHeight > leftLeftHeight ) {
-        this._left = left.moveLeft();
-    }
-
-    return this.moveRight();
-};
-
-RBNode.prototype.traverse = function(func) {
-    if ( this._left  != null ) this._left.traverse(func);
-    func(this);
-    if ( this._right != null ) this._right.traverse(func);
-};
-
-RBNode.prototype.toString = function() {
-    return this._value.toString();
-};
-
-////////////////::
-
-// let rbtree = new RBTree();
-// rbtree.add(13);
-// rbtree.add(8);
-// rbtree.add(17);
-// rbtree.add(1);
-// rbtree.add(11);
-// rbtree.add(15);
-// rbtree.add(25);
-// rbtree.add(6);
-// rbtree.add(22);
-// rbtree.add(27);
-// console.log(rbtree.toString());
-// console.log(rbtree.min());
-// console.log(rbtree.max());
