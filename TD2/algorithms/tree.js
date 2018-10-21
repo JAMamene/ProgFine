@@ -189,7 +189,6 @@ function AVLTreeWrapper() {
 
 AVLTreeWrapper.prototype.insert = function (val) {
     this.tree = this.tree.insert(val);
-    //console.log(this.tree);
 };
 
 AVLTreeWrapper.prototype.extractMin = function () {

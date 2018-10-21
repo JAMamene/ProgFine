@@ -1,18 +1,19 @@
-function ImmutableTree(n) {
+function ImmutableTree() {
     this.left = null;
     this.right = null;
-    this.val = n;
-    this.height = 1;
+    this.val = null;
+    this.height = 0;
 }
 
 function createFromNode(node) {
     if (node === null) {
         return null;
     }
-    let tmp = new ImmutableTree(node.val);
+    let tmp = new ImmutableTree();
     tmp.left = node.left;
     tmp.right = node.right;
     tmp.height = node.height;
+    tmp.val = node.val;
     return tmp;
 }
 
@@ -20,66 +21,74 @@ ImmutableTree.prototype.construct = function (array) {
     array.sort((a, b) => {
         return a - b;
     });
-    console.log(array);
-    return arrToImmutableTree(array, 0, array.length - 1);
+    this._arrToTree(array, 0, array.length - 1);
 };
 
-function arrToImmutableTree(array, start, end) {
-    if (start > end) return null;
+ImmutableTree.prototype._arrToTree = function (array, start, end) {
     let middle = start + Math.floor((end - start) / 2);
-    let tree = new ImmutableTree(array[middle]);
-    tree.left = arrToImmutableTree(array, start, middle - 1);
-    tree.right = arrToImmutableTree(array, middle + 1, end);
-    tree.height = Math.max(height(tree.left), height(tree.right)) + 1;
-    return tree;
-}
+    this.val = array[middle];
+    if (start <= middle - 1) {
+        this.left = new ImmutableTree();
+        this.left._arrToTree(array, start, middle - 1);
+    }
+    if (middle + 1 <= end) {
+        this.right = new ImmutableTree();
+        this.right._arrToTree(array, middle + 1, end);
+    }
+    this.height = Math.max(height(this.left), height(this.right)) + 1;
+};
 
 ImmutableTree.prototype.insert = function (n) {
-    if (n === this.val) return this;
-    let ret = createFromNode(this);
-    if (n < this.val) {
-        if (this.left === null) {
-            ret.left = new ImmutableTree(n);
-        } else {
-            ret.left.insert(n);
-        }
-    } else {
-        if (this.right === null) {
-            ret.right = new ImmutableTree(n);
-        } else {
-            ret.right.insert(n);
-        }
+    if (this.val === null) {
+        let ret = new ImmutableTree();
+        ret.val = n;
+        ret.height = 1;
+        return ret;
     }
-    let lh = height(this.left);
-    let rh = height(this.right);
+    let ret = createFromNode(this);
+    if (n === ret.val) return ret;
+    if (n < ret.val) {
+        if (ret.left === null) {
+            ret.left = new ImmutableTree();
+        }
+        ret.left = ret.left.insert(n);
+    } else {
+        if (ret.right === null) {
+            ret.right = new ImmutableTree();
+        }
+        ret.right = ret.right.insert(n);
+    }
+    let lh = height(ret.left);
+    let rh = height(ret.right);
     ret.height = Math.max(lh, rh) + 1;
     let balance = lh - rh;
     if (balance > 1 && n < ret.left.val) {
-        ret._rotateRight();
+        return ret._rotateRight();
     }
     if (balance < -1 && n > ret.right.val) {
-        ret._rotateLeft();
+        return ret._rotateLeft();
     }
     if (balance > 1 && n > ret.left.val) {
         ret.left = ret.left._rotateLeft();
-        ret._rotateRight();
+        return ret._rotateRight();
     }
     if (balance < -1 && n < ret.right.val) {
         ret.right = ret.right._rotateRight();
-        ret._rotateLeft();
+        return ret._rotateLeft();
     }
     return ret;
 };
 
 // Rotation droite :
-//            y                            x
+//           this                          x
 //           / \          ----->         /   \
-//         x    y.right            x.left     y
+//         x  this.right            x.left   this
 //        / \                                / \
-//  x.left   t                              t   y.right
+//  x.left   t                              t   this.right
+
 ImmutableTree.prototype._rotateRight = function () {
     let x = createFromNode(this.left);
-    let t = this.right;
+    let t = x.right;
     x.right = this;
     this.left = t;
     this.height = Math.max(height(this.left), height(this.right)) + 1;
@@ -88,11 +97,12 @@ ImmutableTree.prototype._rotateRight = function () {
 };
 
 // Rotation gauche :
-//         x                                y
+//        this                              y
 //        / \           ----->            /   \
-//  x.left   y                          x    y.right
+//this.left  y                          this    y.right
 //          / \                        / \
-//         t   y.right           x.left   t
+//         t   y.right        this.left   t
+
 ImmutableTree.prototype._rotateLeft = function () {
     // noinspection JSSuspiciousNameCombination
     let y = createFromNode(this.right);
@@ -107,27 +117,27 @@ ImmutableTree.prototype._rotateLeft = function () {
 
 ImmutableTree.prototype._remove = function (n) {
     let ret = createFromNode(this);
-    if (n < this.val) {
-        ret.left = createFromNode(this.left)._remove(n);
-    } else if (n > this.val) {
-        ret.right = createFromNode(this.right)._remove(n);
+    if (n < ret.val) {
+        ret.left = ret.left._remove(n);
+    } else if (n > ret.val) {
+        ret.right = ret.right._remove(n);
     } else {
-        if (this.left === null && this.right === null) {
+        if (ret.left === null && ret.right === null) {
             return null;
         }
-        if (this.left === null || this.right === null) {
+        if (ret.left === null || ret.right === null) {
             let tmp;
-            if (this.left !== null) {
-                tmp = this.left;
+            if (ret.left !== null) {
+                tmp = ret.left;
             } else {
-                tmp = this.right;
+                tmp = ret.right;
             }
             ret.left = tmp.left;
             ret.right = tmp.right;
             ret.val = tmp.val;
             ret.height = tmp.height;
         } else {
-            let tmp = this.right._minValueNode();
+            let tmp = ret.right._minValueNode();
             ret.left = tmp.left;
             ret.right = tmp.right;
             ret.val = tmp.val;
@@ -135,15 +145,15 @@ ImmutableTree.prototype._remove = function (n) {
             ret.right = ret.right._remove(n);
         }
     }
-    ret.height = Math.max(height(this.left), height(this.right)) + 1;
-    let balance = getBalance(this);
-    if (balance > 1 && getBalance(this.left) >= 0) {
+    ret.height = Math.max(height(ret.left), height(ret.right)) + 1;
+    let balance = getBalance(ret);
+    if (balance > 1 && getBalance(ret.left) >= 0) {
         return ret._rotateRight();
     } else if (balance > 1) {
         ret.left = ret.left._rotateLeft();
         return ret._rotateRight();
     }
-    if (balance < -1 && getBalance(this.right) <= 0) {
+    if (balance < -1 && getBalance(ret.right) <= 0) {
         return ret._rotateLeft();
     } else if (balance < -1) {
         ret.right = ret.right._rotateRight();
@@ -161,9 +171,10 @@ ImmutableTree.prototype._minValueNode = function () {
 };
 
 ImmutableTree.prototype.toString = function () {
-    let l = this.left === null ? "null" : this.left._toString(1);
-    let r = this.right === null ? "null" : this.right._toString(1);
-    return "Value: " + this.val + "\n" + "Left:\n" + l + "Right:\n" + r + "\n";
+    let l = this.left === null ? "   null" : this.left._toString(1);
+    let r = this.right === null ? "   null" : this.right._toString(1);
+    return "Value: " + this.val + "\n" + "Height: " + this.height + "\n" +
+        "Left:\n" + l + "\n" + "Right:\n" + r + "\n";
 };
 
 ImmutableTree.prototype._toString = function (indent) {
@@ -171,11 +182,12 @@ ImmutableTree.prototype._toString = function (indent) {
     for (let i = 0; i < indent; i++) str += "   ";
     let l = this.left === null ? str + "    null" : this.left._toString(indent + 1);
     let r = this.right === null ? str + "    null" : this.right._toString(indent + 1);
-    return str + "Value: " + this.val + "\n" + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
+    return str + "Value: " + this.val + "\n" + str + "Height: " + this.height + "\n"
+        + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
 };
 
 function ImmutableTreeWrapper() {
-    this.tree = null;
+    this.tree = new ImmutableTree();
 }
 
 ImmutableTreeWrapper.prototype.insert = function (val) {
@@ -183,32 +195,15 @@ ImmutableTreeWrapper.prototype.insert = function (val) {
 };
 
 ImmutableTreeWrapper.prototype.extractMin = function () {
-    let min = this._minValueNode().val;
-    this.tree = this._remove(min);
+    let min = this.tree._minValueNode().val;
+    this.tree = this.tree._remove(min);
     return min;
 };
 
 ImmutableTreeWrapper.prototype.construct = function (array) {
-    this.tree = ImmutableTree.construct(array);
+    this.tree.construct(array);
 };
 
 ImmutableTreeWrapper.prototype.toString = function () {
     return this.tree.toString();
 };
-
-
-// let tree = new ImmutableTree(7);
-// tree = tree.insert(4);
-// tree = tree.insert(979);
-// tree = tree.insert(9);
-// tree = tree.insert(7);
-// tree = tree.insert(74);
-// tree = tree.insert(1);
-// tree = tree.insert(3);
-// console.log(tree);
-// console.log(tree.toString());
-// tree = tree._remove(1);
-// tree = tree._remove(4);
-// tree = tree._remove(74);
-// tree = tree._remove(9);
-// console.log(tree.toString());
