@@ -1,4 +1,4 @@
-Object.prototype.Implements = function (interfaceObject) {
+let implements = function (interfaceObject) {
     for (let property in interfaceObject) {
         if (typeof interfaceObject[property] != "string") {
             continue;
@@ -27,7 +27,8 @@ let PriorityQueues = [MinHeap, MinHeap_Immut_Arr_Wrapper, MinHeap_Immut_Tree, AV
 
 // Check that each PriorityqQueue implements the interface
 PriorityQueues.forEach((elem) => {
-    console.assert(new elem().Implements(IPriorityQueue));
+    elem.prototype.implements = implements;
+    console.assert(new elem().implements(IPriorityQueue));
 });
 
 
@@ -39,4 +40,20 @@ PriorityQueues.forEach((elem) => {
     console.assert(structure.extractMin() === 2,structure.constructor.name);
     console.assert(structure.extractMin() === 3,structure.constructor.name);
     console.assert(structure.extractMin() === 4,structure.constructor.name);
+    structure.insert(3);
+    structure.insert(5);
+    structure.insert(1);
+    structure.insert(2);
+    structure.insert(4);
+    structure.insert(13);
+    structure.insert(15);
+    structure.insert(11);
+    structure.insert(12);
+    structure.insert(14);
+    structure.insert(23);
+    structure.insert(25);
+    structure.insert(21);
+    structure.insert(22);
+    structure.insert(24);
+
 });
