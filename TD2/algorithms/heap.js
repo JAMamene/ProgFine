@@ -17,7 +17,6 @@ MinHeap.prototype.extractMin = function () {
     // set first element to last element
     this.data[0] = this.data.pop();
 
-    // call bubble down
     this._percolateDown(0);
 
     return min;

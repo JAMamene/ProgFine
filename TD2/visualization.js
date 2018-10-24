@@ -6,7 +6,7 @@ $(function () {
         let iterations = $("#iterations").val();
         console.log("bailout : " + bailoutTime);
         console.log("iterations : " + iterations);
-        runBench("extractMin", iterations, bailoutTime);
+        runBench("construct", iterations, bailoutTime);
     });
 });
 

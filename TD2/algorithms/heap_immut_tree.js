@@ -16,6 +16,8 @@ MinHeap_Node.prototype.toString = function () {
 //////////
 // TREE
 //////////
+
+//normally the root should not be mutated to keep history of changes but since it's just for testing I didn't have to
 function MinHeap_Immut_Tree() {
     this.root = null;
     this.nbNode = 0;
@@ -49,7 +51,8 @@ MinHeap_Immut_Tree.prototype.extractMin = function () {
     return min;
 };
 
-MinHeap_Immut_Tree.prototype.construct = function (array) {
+// Bad n log n implementation
+MinHeap_Immut_Tree.prototype.construct2 = function (array) {
     array.sort(function (a, b) {
         return a - b;
     });
@@ -73,6 +76,42 @@ MinHeap_Immut_Tree.prototype.construct = function (array) {
         }
     }
     this.nbNode = array.length;
+};
+
+MinHeap_Immut_Tree.prototype.construct = function (array) {
+    let queue = [];
+    let cpt = 0;
+    this.root = new MinHeap_Node(array[cpt++]);
+    queue.push(this.root);
+    while (!(queue.length === 0)) {
+        let tempNode = queue.pop();
+
+        if (cpt < array.length) {
+            let tempLeft = new MinHeap_Node(array[cpt++]);
+            tempNode.left = tempLeft;
+            queue.unshift(tempLeft);
+        }
+
+        if (cpt < array.length) {
+            let tempRight = new MinHeap_Node(array[cpt++]);
+            tempNode.right = tempRight;
+            queue.unshift(tempRight);
+        }
+    }
+    this.nbNode = array.length;
+    let piv = Math.floor(this.nbNode / 2);
+    for (let i = piv; i >= 0; i--) {
+        let res = this._getToNode(i);
+        if (res[0] == null) {
+            this.root=this._percolateDown(this.root);
+        }
+        else if (res[2]) {
+            res[0].left = this._percolateDown(res[1]);
+        }
+        else {
+            res[0].right = this._percolateDown(res[1]);
+        }
+    }
 };
 
 MinHeap_Immut_Tree.prototype.toString = function () {
@@ -101,6 +140,29 @@ MinHeap_Immut_Tree.prototype.toString = function () {
     }
 
     return lines.join("\n");
+};
+
+
+//// Private methods
+
+MinHeap_Immut_Tree.prototype._getToNode = function (id) {
+    let node = this.root;
+    let parent = null;
+    let isLeft;
+    let path = (id >>> 0).toString(2).substring(1);
+    for (let i = 0; i < path.length; i++) {
+        if (path.charAt(i) === '0') {
+            parent = node;
+            node = node.left;
+            isLeft = true;
+        }
+        else {
+            parent = node;
+            node = node.right;
+            isLeft = false;
+        }
+    }
+    return [parent, node, isLeft];
 };
 
 MinHeap_Immut_Tree.prototype._insertLastNode = function (val) {
@@ -216,13 +278,13 @@ MinHeap_Immut_Tree.prototype._percolateDown = function (node) {
     let left = node.left;
     let right = node.right;
     let toSwap = null;
-    if (left !== null) {
+    if (left != null) {
         if (node.val > left.val) {
             toSwap = left;
         }
     }
     if (right !== null) {
-        if (node.val > right.val && (left == null) || (left !== null && right.val < left.val)) {
+        if (node.val > right.val && (left == null) || (left != null && right.val < left.val && node.val > right.val)) {
             toSwap = right;
         }
     }
@@ -237,39 +299,17 @@ MinHeap_Immut_Tree.prototype._percolateDown = function (node) {
         }
         let nParent = res[0];
         let nChild = res[1];
-        node = nParent;
-        ///// TODO
-        this._percolateDown(nChild);
-        return node;
+        if (toSwap === left) {
+            nParent.left = this._percolateDown(nChild);
+        }
+        else {
+            nParent.right = this._percolateDown(nChild);
+        }
+        return nParent;
     }
     else {
         return node;
     }
-    // let node = this.root;
-    // let old = null;
-    // while (true) {
-    //     let left = node.left;
-    //     let right = node.right;
-    //     let toSwap = null;
-    //     if (left != null) {
-    //         if (node.val > left.val) {
-    //             toSwap = left;
-    //         }
-    //     }
-    //     if (right != null) {
-    //         if (node.val > right.val && (node.left == null) || (left !== null && right.val < left.val)) {
-    //             toSwap = right;
-    //         }
-    //     }
-    //
-    //     if (toSwap == null) {
-    //         break;
-    //     }
-    //
-    //     let res = this._swapDown(old, node, toSwap);
-    //     node = res[0];
-    //     old = res[1];
-    // }
 };
 
 MinHeap_Immut_Tree.prototype._swapDown = function (parent, node) {
@@ -287,99 +327,33 @@ MinHeap_Immut_Tree.prototype._swapDown = function (parent, node) {
         nNode.left = parent.left;
         nNode.right = nParent;
     }
-    // let nParent = new MinHeap_Node(parent.val);
-    // nParent.left = node.left;
-    // nParent.right = node.right;
-    //
-    // let nNode = new MinHeap_Node(node.val);
-    //
-    // if (parent.left === node) {
-    //     nNode.left = nParent;
-    //     nNode.right = parent.right;
-    // }
-    // else {
-    //     nNode.left = parent.left;
-    //     nNode.right = nParent;
-    // }
-    //
-    // if (gp != null) {
-    //     if (gp.left === parent) {
-    //         gp.left = nNode;
-    //     }
-    //     else {
-    //         gp.right = nNode;
-    //     }
-    // }
-    // else {
-    //     this.root = nNode;
-    // }
-    // //nParent is now child and nNode is parent
     return [nNode, nParent];
 };
 
-let heap = new MinHeap_Immut_Tree();
-heap.insert(5);
-//console.log(heap.toString());
-heap.insert(6);
-//console.log(heap.toString());
-heap.insert(4);
-//console.log(heap.toString());
-heap.insert(1);
-//console.log(heap.toString());
+//BrokenCaseFixVerification
+let minHeapImmutTree = new MinHeap_Immut_Tree();
+minHeapImmutTree.insert(5);
+minHeapImmutTree.insert(6);
+minHeapImmutTree.insert(16);
+minHeapImmutTree.insert(14);
+minHeapImmutTree.insert(27);
+minHeapImmutTree.insert(23);
+minHeapImmutTree.insert(25);
+minHeapImmutTree.insert(11);
+minHeapImmutTree.insert(17);
+minHeapImmutTree.insert(4);
+minHeapImmutTree.insert(1);
+minHeapImmutTree.insert(3);
+minHeapImmutTree.insert(15);
+minHeapImmutTree.insert(13);
+minHeapImmutTree.insert(21);
+minHeapImmutTree.insert(7);
+minHeapImmutTree.insert(26);
+minHeapImmutTree.insert(24);
+minHeapImmutTree.extractMin();
+minHeapImmutTree.extractMin();
+minHeapImmutTree.extractMin();
+console.assert(minHeapImmutTree.root.left.right.val === 14, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
+console.assert(minHeapImmutTree.root.left.right.right.val === 26, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
 
-heap.insert(7);
-//console.log(heap.toString());
-heap.insert(3);
-console.log(heap.toString());
-// console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-console.log(heap.extractMin());
-console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// let heap = new MinHeap_Immut_Tree();
-// heap.construct([1, 3, 4, 5, 6, 2, 9, 10]);
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-//
-//
-// bench
-// heapify
-// Suppression (sans compter ajout)
-// Ajout + Suppression (avec éventuellement opti tas)
-
-
-//    let nTemp = nNode;
-//     let nGp;
-//     while (true) {
-//         let gp = stack.pop();
-//         console.log(gp);
-//         if (gp == undefined || gp == null) {
-//             this.root = nTemp;
-//             break;
-//         }
-//         else {
-//             nGp = new MinHeap_Node(gp.val);
-//             if (nGp.left === parent) {
-//                 nGp.left = nTemp;
-//                 nGp.right = gp.right;
-//             }
-//             else {
-//                 nGp.left = nTemp.left;
-//                 nGp.right = nTemp;
-//             }
-//             nTemp = nGp;
-//         }
-//
-//     }
-//     return nNode;
+// minHeapImmutTree.construct([10, 39, 47, 27, 46, 129, 7, 2, 4, 3, 9, 8, 1]);

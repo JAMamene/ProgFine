@@ -22,17 +22,9 @@ MinHeap_Immut_Arr.prototype.extractMin = function () {
     return [newHeap, min];
 };
 
-MinHeap_Immut_Arr.prototype.construct = function (array) {
-    this.data = array;
-    let piv = Math.floor(this.data.length / 2) - 1;
-    for (let i = piv; i >= 0; i--) {
-        this._percolateDown(i);
-    }
-};
+MinHeap_Immut_Arr.prototype.construct = MinHeap.prototype.construct;
 
-MinHeap_Immut_Arr.prototype.toString = function () {
-    return this.data;
-};
+MinHeap_Immut_Arr.prototype.toString = MinHeap.prototype.toString;
 
 //// PRIVATE
 
