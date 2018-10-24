@@ -6,7 +6,7 @@ $(function () {
         let iterations = $("#iterations").val();
         console.log("bailout : " + bailoutTime);
         console.log("iterations : " + iterations);
-        runBench("construct", iterations, bailoutTime);
+        runBench("insert", iterations, bailoutTime);
     });
 });
 
@@ -79,7 +79,7 @@ function runBench(funcToTest, iterations, bailoutTime) {
     let selectedAlgs = PriorityQueues;
     console.log(PriorityQueues);
     // The different tab size to experiment on
-    let ns = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+    let ns = [2, 4, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767 /*, 65535*/];
     let bailoutTimeMS = bailoutTime;
     // The number of ignored ns (the x first one), reason is for warmup and because time of small tabs arre inconsistent
     let warmupOffset = 7;

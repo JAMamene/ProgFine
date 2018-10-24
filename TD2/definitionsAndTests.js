@@ -36,7 +36,8 @@ PriorityQueues.forEach((elem) => {
 // Check that each PriorityqQueue implements the interface
 PriorityQueues.forEach((elem) => {
     let structure = new elem();
-    structure.construct([1, 3, 4, 5, 6, 2, 9, 10]);
+    structure.construct([1, 3, 4, 5, 6, 2, 9]);
+    console.log(structure.toString());
     console.assert(structure.extractMin() === 1, structure.constructor.name, "\n" + structure.toString());
     console.assert(structure.extractMin() === 2, structure.constructor.name, "\n" + structure.toString());
     console.assert(structure.extractMin() === 3, structure.constructor.name, "\n" + structure.toString());
@@ -44,9 +45,8 @@ PriorityQueues.forEach((elem) => {
     console.assert(structure.extractMin() === 5, structure.constructor.name, "\n" + structure.toString());
     console.assert(structure.extractMin() === 6, structure.constructor.name, "\n" + structure.toString());
     console.assert(structure.extractMin() === 9, structure.constructor.name, "\n" + structure.toString());
-    console.assert(structure.extractMin() === 10, structure.constructor.name, "\n" + structure.toString());
     structure = new elem();
-    let n = 32;
+    let n = 31;
     let arr = shuffle(n);
     for (let i = 0; i < n; i++) {
         structure.insert(arr[i]);
