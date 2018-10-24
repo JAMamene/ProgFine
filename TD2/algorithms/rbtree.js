@@ -25,7 +25,7 @@ Node.prototype.toString = function () {
 function RBTree() {
     this._root = null;
     this._comparator = function (a, b) {
-        return b - a;
+        return a - b;
     };
     this.size = 0;
 }
@@ -130,7 +130,6 @@ RBTree.prototype.remove = function (data) {
     if (this._root === null) {
         return false;
     }
-
     let head = new Node(undefined); // fake tree root
     let node = head;
     node.right = this._root;
@@ -138,24 +137,18 @@ RBTree.prototype.remove = function (data) {
     let gp = null; // grand parent
     let found = null; // found item
     let dir = 1;
-
     while (node.get_child(dir) !== null) {
         let last = dir;
-
         // update helpers
         gp = p;
         p = node;
         node = node.get_child(dir);
-
         let cmp = this._comparator(data, node.data);
-
         dir = cmp > 0;
-
         // save found node
         if (cmp === 0) {
             found = node;
         }
-
         // push the red node down
         if (!this.is_red(node) && !this.is_red(node.get_child(dir))) {
             if (this.is_red(node.get_child(!dir))) {
@@ -171,17 +164,13 @@ RBTree.prototype.remove = function (data) {
                         p.red = false;
                         sibling.red = true;
                         node.red = true;
-                    }
-                    else {
+                    } else {
                         let dir2 = gp.right === p;
-
                         if (this.is_red(sibling.get_child(last))) {
                             gp.set_child(dir2, this._double_rotate(p, last));
-                        }
-                        else if (this.is_red(sibling.get_child(!last))) {
+                        } else if (this.is_red(sibling.get_child(!last))) {
                             gp.set_child(dir2, this._single_rotate(p, last));
                         }
-
                         // ensure correct coloring
                         let gpc = gp.get_child(dir2);
                         gpc.red = true;
@@ -206,13 +195,11 @@ RBTree.prototype.remove = function (data) {
     if (this._root !== null) {
         this._root.red = false;
     }
-
     return found !== null;
 };
 
 RBTree.prototype.toString = function () {
     let lines = [];
-
     if (this._root != null) {
         let indentText = "  ";
         let stack = [[this._root, 0, "^"]];

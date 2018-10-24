@@ -223,5 +223,6 @@ AVLTreeWrapper.prototype.construct = function (array) {
 };
 
 AVLTreeWrapper.prototype.toString = function () {
+    if (this.tree === null) return new AVLTree().toString();
     return this.tree.toString();
 };

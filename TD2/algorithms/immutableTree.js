@@ -172,6 +172,8 @@ ImmutableTree.prototype._minValueNode = function () {
 
 // noinspection JSUnusedGlobalSymbols
 ImmutableTree.prototype.toString = AVLTree.prototype.toString;
+// noinspection JSUnusedGlobalSymbols
+ImmutableTree.prototype._toString = AVLTree.prototype.toString;
 
 function ImmutableTreeWrapper() {
     // noinspection JSUnusedGlobalSymbols

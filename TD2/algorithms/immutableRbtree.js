@@ -11,25 +11,23 @@ function ImmutableRBTree() {
 }
 
 function rb_immut_rotate_left(node) {
-    let child = copyRBNode(node.right);
-    let childLeft = child.left;
-    child.left = node;
-    node.right = childLeft;
-    return child;
+    let x = copyRBNode(node.right);
+    node.right = x.left;
+    x.left = node;
+    x.red = x.left.red;
+    x.left = copyRBNode(x.left);
+    x.left.red = true;
+    return x;
 }
 
 function rb_immut_rotate_right(node) {
-    let child = copyRBNode(node.left);
-    let childRight = child.right;
-    child.right = node;
-    node.left = childRight;
-    return child;
-}
-
-function swapColors(node, other) {
-    let tmp = node.red;
-    node.red = other.red;
-    other.red = tmp;
+    let x = copyRBNode(node.left);
+    node.left = x.right;
+    x.right = node;
+    x.red = x.right.red;
+    x.right = copyRBNode(x.right);
+    x.right.red = true;
+    return x;
 }
 
 function is_red(node) {
@@ -37,41 +35,33 @@ function is_red(node) {
 }
 
 ImmutableRBTree.prototype.insert = function (val) {
+    function _insert(node, data) {
+        if (node === null) {
+            return new Node(data);
+        }
+        node = copyRBNode(node);
+        if (data < node.data) {
+            node.left = _insert(node.left, data);
+        } else if (data > node.data) {
+            node.right = _insert(node.right, data);
+        } else {
+            return node;
+        }
+        if (is_red(node.right) && !is_red(node.left)) {
+            node = rb_immut_rotate_left(node);
+        }
+        if (is_red(node.left) && is_red(node.left.left)) {
+            node = rb_immut_rotate_right(node);
+        }
+        if (is_red(node.left) && is_red(node.right)) {
+            flipColors(node);
+        }
+        return node;
+    }
+
     this._root = _insert(this._root, val);
     this._root.red = false;
 };
-
-function _insert(node, data) {
-    if (node === null) {
-        return new Node(data);
-    }
-    node = copyRBNode(node);
-    if (data < node.data) {
-        node.left = _insert(node.left, data);
-    } else if (data > node.data) {
-        node.right = _insert(node.right, data);
-    } else {
-        return node;
-    }
-    if (is_red(node.right) && !is_red(node.left)) {
-        node = rb_immut_rotate_left(node);
-        node.left = copyRBNode(node.left);
-        swapColors(node, node.left);
-    }
-    if (is_red(node.left) && is_red(node.left.left)) {
-        node = rb_immut_rotate_right(node);
-        node.right = copyRBNode(node.right);
-        swapColors(node, node.right);
-    }
-    if (is_red(node.left) && is_red(node.right)) {
-        node.red = !node.red;
-        node.left = copyRBNode(node.left);
-        node.right = copyRBNode(node.right);
-        node.left.red = false;
-        node.right.red = false;
-    }
-    return node;
-}
 
 function flipColors(node) {
     node.red = !node.red;
@@ -138,9 +128,16 @@ ImmutableRBTree.prototype.extractMin = function () {
         }
     }
 
-    let minNode = findMin(this._root);
+    let node = copyRBNode(this._root);
+    if (!is_red(node.left) && !is_red(node.right)) {
+        node.red = true;
+    }
+    let minNode = findMin(node);
     let min = minNode.data;
-    this._root = deleteMin(this._root);
+    this._root = deleteMin(node);
+    if (this._root !== null) {
+        this._root.red = false;
+    }
     return min;
 };
 
@@ -148,6 +145,7 @@ ImmutableRBTree.prototype.extractMin = function () {
 ImmutableRBTree.prototype.remove = function (val) {
 
     function minNode(node) {
+        console.log(node.toString());
         if (node.left === null) {
             return node;
         } else return minNode(node.left);
@@ -167,7 +165,7 @@ ImmutableRBTree.prototype.remove = function (val) {
             if (node.data === val && node.right === null) {
                 return null;
             }
-            if (!is_red(node.right) && is_red(node.right.left)) {
+            if (!is_red(node.right) && !is_red(node.right.left)) {
                 node = moveRedRight(node);
             }
             if (node.data === val) {
@@ -185,7 +183,14 @@ ImmutableRBTree.prototype.remove = function (val) {
         // empty tree
         return;
     }
-    this._root = _remove(this._root, val);
+    let node = copyRBNode(this._root);
+    if (!is_red(node.left) && !is_red(node.right)) {
+        node.red = true;
+    }
+    this._root = _remove(node, val);
+    if (this._root !== null) {
+        this._root.red = false;
+    }
 };
 
 ImmutableRBTree.prototype.toString = function () {

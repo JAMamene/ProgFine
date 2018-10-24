@@ -51,7 +51,6 @@ PriorityQueues.forEach((elem) => {
     for (let i = 0; i < n; i++) {
         structure.insert(arr[i]);
     }
-    console.log(structure.toString());
     for (let i = 0; i < n; i++) {
         console.assert(structure.extractMin() === i, structure.constructor.name, "\n" + structure.toString());
     }
