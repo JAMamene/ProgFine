@@ -183,6 +183,27 @@ AVLTree.prototype._toString = function (indent) {
         + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
 };
 
+AVLTreeWrapper.prototype.find = function (val) {
+    function _find(node, val) {
+        if (node === null) {
+            return false;
+        }
+        if (node.val === val) {
+            return true;
+        } else if (val > node.val) {
+            return _find(node.right, val);
+        } else {
+            return _find(node.left, val);
+        }
+    }
+
+    return _find(tree, val);
+};
+
+AVLTreeWrapper.prototype.remove = function (val) {
+    this.tree = this.tree._remove(val);
+};
+
 function AVLTreeWrapper() {
     this.tree = new AVLTree();
 }
