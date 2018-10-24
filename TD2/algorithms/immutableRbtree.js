@@ -108,16 +108,6 @@ function moveRedLeft(node) {
     return node;
 }
 
-// // Assuming that h is red and both h.right and h.right.left
-//     // are black, make h.right or one of its children red.
-//     private Node moveRedRight(Node h) {
-//         flipColors(h);
-//         if (isRed(h.left.left)) {
-//             h = rotateRight(h);
-//             flipColors(h);
-//         }
-//         return h;
-//     }
 function moveRedRight(node) {
     flipColors(node);
     if (is_red(node.left.left)) {
@@ -163,33 +153,8 @@ ImmutableRBTree.prototype.remove = function (val) {
         } else return minNode(node.left);
     }
 
-    // // delete the key-value pair with the given key rooted at h
-//     private Node delete(Node h, Key key) {
-//         if (key.compareTo(h.key) < 0)  {
-//             if (!isRed(h.left) && !isRed(h.left.left))
-//                 h = moveRedLeft(h);
-//             h.left = delete(h.left, key);
-//         }
-//         else {
-//             if (isRed(h.left))
-//                 h = rotateRight(h);
-//             if (key.compareTo(h.key) == 0 && (h.right == null))
-//                 return null;
-//             if (!isRed(h.right) && !isRed(h.right.left))
-//                 h = moveRedRight(h);
-//             if (key.compareTo(h.key) == 0) {
-//                 Node x = min(h.right);
-//                 h.key = x.key;
-//                 h.val = x.val;
-//                 // h.val = get(h.right, min(h.right).key);
-//                 // h.key = min(h.right).key;
-//                 h.right = deleteMin(h.right);
-//             }
-//             else h.right = delete(h.right, key);
-//         }
-//         return balance(h);
-//     }
     function _remove(node, val) {
+        node = copyRBNode(node);
         if (val < node.data) {
             if (!is_red(node.left) && !is_red(node.left.left)) {
                 node = moveRedLeft(node);
@@ -213,6 +178,7 @@ ImmutableRBTree.prototype.remove = function (val) {
                 node.right = _remove(node.right, val);
             }
         }
+        return balance(node);
     }
 
     if (this._root === null) {
@@ -247,14 +213,4 @@ ImmutableRBTree.prototype.toString = function () {
 
 ImmutableRBTree.prototype.construct = RBTree.prototype.construct;
 ImmutableRBTree.prototype.find = RBTree.prototype.find;
-
-// let tree = new ImmutableRBTree();
-// let arr = [22, 11, 18, 8, 26, 3, 7];
-// tree.construct(arr);
-// console.log(tree.toString());
-// for (let i of arr) {
-//     console.log(i);
-//     tree.remove(i);
-//     console.log(tree.toString());
-// }
 
