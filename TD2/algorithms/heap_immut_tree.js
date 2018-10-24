@@ -170,9 +170,61 @@ MinHeap_Immut_Tree.prototype._percolateUp = function (stack, node) {
             return;
         }
         if (parent.val > node.val) {
-            node = this._moveUp(stackCopy, node);
+            let res = this._moveUp(stackCopy, node);
+            stack = res[0];
+            node = res[1];
         }
     }
+};
+
+MinHeap_Immut_Tree.prototype._moveUp = function (stack, node) {
+
+    let parent = stack.pop();
+
+    if (parent == null) {
+        return;
+    }
+
+    let nParent = new MinHeap_Node(parent.val);
+    nParent.left = node.left;
+    nParent.right = node.right;
+
+    let nNode = new MinHeap_Node(node.val);
+
+    if (parent.left === node) {
+        nNode.left = nParent;
+        nNode.right = parent.right;
+    }
+    else {
+        nNode.left = parent.left;
+        nNode.right = nParent;
+    }
+
+    let nTemp = nNode;
+    let nGp;
+    let queue = [];
+    while (true) {
+        let gp = stack.pop();
+        if (gp === undefined || gp === null) {
+            this.root = nTemp;
+            break;
+        }
+        else {
+            nGp = new MinHeap_Node(gp.val);
+            if (gp.left === parent) {
+                nGp.left = nTemp;
+                nGp.right = gp.right;
+            }
+            else {
+                nGp.left = gp.left;
+                nGp.right = nTemp;
+            }
+            nTemp = nGp;
+            queue.unshift(nGp);
+        }
+
+    }
+    return [queue, nNode];
 };
 
 MinHeap_Immut_Tree.prototype._percolateDown = function () {
@@ -203,44 +255,6 @@ MinHeap_Immut_Tree.prototype._percolateDown = function () {
     }
 };
 
-MinHeap_Immut_Tree.prototype._moveUp = function (stack, node) {
-
-    let parent = stack.pop();
-    let gp = stack.pop();
-
-    if (parent == null) {
-        return;
-    }
-
-    let nParent = new MinHeap_Node(parent.val);
-    nParent.left = node.left;
-    nParent.right = node.right;
-
-    let nNode = new MinHeap_Node(node.val);
-
-    if (parent.left === node) {
-        nNode.left = nParent;
-        nNode.right = parent.right;
-    }
-    else {
-        nNode.left = parent.left;
-        nNode.right = nParent;
-    }
-
-    if (gp != null) {
-        if (gp.left = parent) {
-            gp.left = nNode;
-        }
-        else {
-            gp.right = nNode;
-        }
-    }
-    else {
-        this.root = nNode;
-    }
-    return nNode;
-};
-
 MinHeap_Immut_Tree.prototype._swapDown = function (gp, parent, node) {
     let nParent = new MinHeap_Node(parent.val);
     nParent.left = node.left;
@@ -269,15 +283,23 @@ MinHeap_Immut_Tree.prototype._swapDown = function (gp, parent, node) {
         this.root = nNode;
     }
     //nParent is now child and nNode is parent
-    return [nParent,nNode];
+    return [nParent, nNode];
 };
 
-// let heap = new MinHeap_Immut_Tree();
-// heap.insert(2);
-// heap.insert(3);
-// heap.insert(4);
-// console.log(heap.toString());
-// heap.insert(1);
+let heap = new MinHeap_Immut_Tree();
+heap.insert(5);
+console.log(heap.toString());
+heap.insert(6);
+console.log(heap.toString());
+heap.insert(4);
+console.log(heap.toString());
+heap.insert(1);
+console.log(heap.toString());
+
+heap.insert(7);
+console.log(heap.toString());
+heap.insert(3);
+console.log(heap.toString());
 // console.log(heap.toString());
 // console.log(heap.extractMin());
 // console.log(heap.toString());
@@ -304,3 +326,29 @@ MinHeap_Immut_Tree.prototype._swapDown = function (gp, parent, node) {
 // heapify
 // Suppression (sans compter ajout)
 // Ajout + Suppression (avec éventuellement opti tas)
+
+
+//    let nTemp = nNode;
+//     let nGp;
+//     while (true) {
+//         let gp = stack.pop();
+//         console.log(gp);
+//         if (gp == undefined || gp == null) {
+//             this.root = nTemp;
+//             break;
+//         }
+//         else {
+//             nGp = new MinHeap_Node(gp.val);
+//             if (nGp.left === parent) {
+//                 nGp.left = nTemp;
+//                 nGp.right = gp.right;
+//             }
+//             else {
+//                 nGp.left = nTemp.left;
+//                 nGp.right = nTemp;
+//             }
+//             nTemp = nGp;
+//         }
+//
+//     }
+//     return nNode;

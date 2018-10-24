@@ -40,20 +40,18 @@ PriorityQueues.forEach((elem) => {
     console.assert(structure.extractMin() === 2, structure.constructor.name);
     console.assert(structure.extractMin() === 3, structure.constructor.name);
     console.assert(structure.extractMin() === 4, structure.constructor.name);
-    structure.insert(3);
-    structure.insert(5);
-    structure.insert(1);
-    structure.insert(2);
-    structure.insert(4);
-    structure.insert(13);
-    structure.insert(15);
-    structure.insert(11);
-    structure.insert(12);
-    structure.insert(14);
-    structure.insert(23);
-    structure.insert(25);
-    structure.insert(21);
-    structure.insert(22);
-    structure.insert(24);
-
+    console.assert(structure.extractMin() === 5, structure.constructor.name);
+    console.assert(structure.extractMin() === 6, structure.constructor.name);
+    console.assert(structure.extractMin() === 9, structure.constructor.name);
+    console.assert(structure.extractMin() === 10, structure.constructor.name);
+    structure = new elem();
+    let n = 64;
+    let arr = shuffle(n);
+    for (let i = 0; i < n; i++) {
+        structure.insert(arr[i]);
+    }
+    console.log(structure);
+    for (let i = 0; i < n; i++) {
+        console.assert(structure.extractMin() === i, structure.constructor.name);
+    }
 });
