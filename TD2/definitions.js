@@ -45,12 +45,12 @@ PriorityQueues.forEach((elem) => {
     console.assert(structure.extractMin() === 9, structure.constructor.name);
     console.assert(structure.extractMin() === 10, structure.constructor.name);
     structure = new elem();
-    let n = 64;
+    let n = 32;
     let arr = shuffle(n);
     for (let i = 0; i < n; i++) {
         structure.insert(arr[i]);
     }
-    console.log(structure);
+    console.log(structure.toString());
     for (let i = 0; i < n; i++) {
         console.assert(structure.extractMin() === i, structure.constructor.name);
     }

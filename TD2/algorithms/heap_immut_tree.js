@@ -201,6 +201,7 @@ MinHeap_Immut_Tree.prototype._moveUp = function (stack, node) {
     }
 
     let nTemp = nNode;
+    let nnParent = parent;
     let nGp;
     let queue = [];
     while (true) {
@@ -211,7 +212,7 @@ MinHeap_Immut_Tree.prototype._moveUp = function (stack, node) {
         }
         else {
             nGp = new MinHeap_Node(gp.val);
-            if (gp.left === parent) {
+            if (gp.left === nnParent) {
                 nGp.left = nTemp;
                 nGp.right = gp.right;
             }
@@ -220,6 +221,7 @@ MinHeap_Immut_Tree.prototype._moveUp = function (stack, node) {
                 nGp.right = nTemp;
             }
             nTemp = nGp;
+            nnParent = gp;
             queue.unshift(nGp);
         }
 
