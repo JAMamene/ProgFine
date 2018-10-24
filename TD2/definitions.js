@@ -36,14 +36,14 @@ PriorityQueues.forEach((elem) => {
 PriorityQueues.forEach((elem) => {
     let structure = new elem();
     structure.construct([1, 3, 4, 5, 6, 2, 9, 10]);
-    console.assert(structure.extractMin() === 1, structure.constructor.name);
-    console.assert(structure.extractMin() === 2, structure.constructor.name);
-    console.assert(structure.extractMin() === 3, structure.constructor.name);
-    console.assert(structure.extractMin() === 4, structure.constructor.name);
-    console.assert(structure.extractMin() === 5, structure.constructor.name);
-    console.assert(structure.extractMin() === 6, structure.constructor.name);
-    console.assert(structure.extractMin() === 9, structure.constructor.name);
-    console.assert(structure.extractMin() === 10, structure.constructor.name);
+    console.assert(structure.extractMin() === 1, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 2, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 3, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 4, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 5, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 6, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 9, structure.constructor.name, structure.toString());
+    console.assert(structure.extractMin() === 10, structure.constructor.name, structure.toString());
     structure = new elem();
     let n = 32;
     let arr = shuffle(n);
@@ -52,6 +52,6 @@ PriorityQueues.forEach((elem) => {
     }
     console.log(structure.toString());
     for (let i = 0; i < n; i++) {
-        console.assert(structure.extractMin() === i, structure.constructor.name);
+        console.assert(structure.extractMin() === i, structure.constructor.name, structure.toString());
     }
 });
