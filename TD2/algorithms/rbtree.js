@@ -110,6 +110,21 @@ RBTree.prototype.insert = function (data) {
     return ret;
 };
 
+RBTree.prototype.extractMin = function () {
+    function findMin(node) {
+        if (node.left === null) {
+            return node.data;
+        } else {
+            return findMin(node.left);
+        }
+    }
+
+    let min = findMin(this._root);
+    this.remove(min);
+    return min;
+};
+
+
 // returns true if removed, false if not found
 RBTree.prototype.remove = function (data) {
     if (this._root === null) {

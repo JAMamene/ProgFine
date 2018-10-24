@@ -23,7 +23,8 @@ let IPriorityQueue =
         toString: "function"
     };
 
-let PriorityQueues = [MinHeap, MinHeap_Immut_Arr_Wrapper, MinHeap_Immut_Tree, AVLTreeWrapper, ImmutableTreeWrapper];
+let PriorityQueues = [MinHeap, MinHeap_Immut_Arr_Wrapper, MinHeap_Immut_Tree, AVLTreeWrapper, ImmutableTreeWrapper,
+    RBTree, ImmutableRBTree];
 
 // Check that each PriorityqQueue implements the interface
 PriorityQueues.forEach((elem) => {
