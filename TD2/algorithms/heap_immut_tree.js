@@ -79,31 +79,13 @@ MinHeap_Immut_Tree.prototype.construct2 = function (array) {
 };
 
 MinHeap_Immut_Tree.prototype.construct = function (array) {
-    let queue = [];
-    let cpt = 0;
-    this.root = new MinHeap_Node(array[cpt++]);
-    queue.push(this.root);
-    while (!(queue.length === 0)) {
-        let tempNode = queue.pop();
-
-        if (cpt < array.length) {
-            let tempLeft = new MinHeap_Node(array[cpt++]);
-            tempNode.left = tempLeft;
-            queue.unshift(tempLeft);
-        }
-
-        if (cpt < array.length) {
-            let tempRight = new MinHeap_Node(array[cpt++]);
-            tempNode.right = tempRight;
-            queue.unshift(tempRight);
-        }
-    }
     this.nbNode = array.length;
+    this.root = this._arrayToTree(array, this.root, 0);
     let piv = Math.floor(this.nbNode / 2);
     for (let i = piv; i >= 0; i--) {
         let res = this._getToNode(i);
         if (res[0] == null) {
-            this.root=this._percolateDown(this.root);
+            this.root = this._percolateDown(this.root);
         }
         else if (res[2]) {
             res[0].left = this._percolateDown(res[1]);
@@ -138,7 +120,6 @@ MinHeap_Immut_Tree.prototype.toString = function () {
             if (node.left != null) stack.push([node.left, indent + 1, "L"]);
         }
     }
-
     return lines.join("\n");
 };
 
@@ -283,7 +264,7 @@ MinHeap_Immut_Tree.prototype._percolateDown = function (node) {
             toSwap = left;
         }
     }
-    if (right !== null) {
+    if (right != null) {
         if (node.val > right.val && (left == null) || (left != null && right.val < left.val && node.val > right.val)) {
             toSwap = right;
         }
@@ -330,6 +311,15 @@ MinHeap_Immut_Tree.prototype._swapDown = function (parent, node) {
     return [nNode, nParent];
 };
 
+MinHeap_Immut_Tree.prototype._arrayToTree = function (arr, root, i) {
+    if (i < arr.length) {
+        root = new MinHeap_Node(arr[i]);
+        root.left = this._arrayToTree(arr, root.left, 2 * i + 1);
+        root.right = this._arrayToTree(arr, root.right, 2 * i + 2);
+    }
+    return root;
+};
+
 //BrokenCaseFixVerification
 let minHeapImmutTree = new MinHeap_Immut_Tree();
 minHeapImmutTree.insert(5);
@@ -356,4 +346,5 @@ minHeapImmutTree.extractMin();
 console.assert(minHeapImmutTree.root.left.right.val === 14, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
 console.assert(minHeapImmutTree.root.left.right.right.val === 26, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
 
-// minHeapImmutTree.construct([10, 39, 47, 27, 46, 129, 7, 2, 4, 3, 9, 8, 1]);
+// minHeapImmutTree.construct([10, 39, 47, 27, 46, 129, 7, 2, 4, 3, 9, 8, 1, 12, 78, 13, 14, 15]);
+// console.log(minHeapImmutTree.toString());
