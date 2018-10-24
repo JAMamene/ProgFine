@@ -243,3 +243,48 @@ RBTree.prototype._double_rotate = function (root, dir) {
     root.set_child(!dir, this._single_rotate(root.get_child(!dir), !dir));
     return this._single_rotate(root, dir);
 };
+
+RBTree.prototype.construct = function (array) {
+    array.sort((a, b) => {
+        return a - b;
+    });
+    this._root = new Node(null);
+    this._root._arrToTree(array, 0, array.length - 1, 0, Math.floor(Math.log2(array.length)));
+    this._root.red = false;
+};
+
+Node.prototype._arrToTree = function (array, start, end, depth, max) {
+    let middle = start + Math.floor((end - start) / 2);
+    this.data = array[middle];
+    if (start <= middle - 1) {
+        this.left = new Node(null);
+        this.left.red = false;
+        this.left._arrToTree(array, start, middle - 1, depth + 1, max);
+    }
+    if (middle + 1 <= end) {
+        this.right = new Node(null);
+        this.right.red = false;
+        this.right._arrToTree(array, middle + 1, end, depth + 1, max);
+    }
+    if (depth === max) {
+        this.red = true;
+    }
+};
+
+RBTree.prototype.find = function (val) {
+    function _find(node, val) {
+        if (node === null) {
+            return false;
+        }
+        if (node.data === val) {
+            return true;
+        }
+        if (val > node.data) {
+            return _find(node.right, val);
+        } else {
+            return _find(node.left, val);
+        }
+    }
+
+    return _find(this._root, val);
+};

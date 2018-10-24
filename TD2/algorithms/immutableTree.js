@@ -170,40 +170,24 @@ ImmutableTree.prototype._minValueNode = function () {
     return tmp;
 };
 
-ImmutableTree.prototype.toString = function () {
-    let l = this.left === null ? "   null" : this.left._toString(1);
-    let r = this.right === null ? "   null" : this.right._toString(1);
-    return "Value: " + this.val + "\n" + "Height: " + this.height + "\n" +
-        "Left:\n" + l + "\n" + "Right:\n" + r + "\n";
-};
-
-ImmutableTree.prototype._toString = function (indent) {
-    let str = "";
-    for (let i = 0; i < indent; i++) str += "   ";
-    let l = this.left === null ? str + "    null" : this.left._toString(indent + 1);
-    let r = this.right === null ? str + "    null" : this.right._toString(indent + 1);
-    return str + "Value: " + this.val + "\n" + str + "Height: " + this.height + "\n"
-        + str + "Left:\n" + l + "\n" + str + "Right:\n" + r + "\n";
-};
+// noinspection JSUnusedGlobalSymbols
+ImmutableTree.prototype.toString = AVLTree.prototype.toString;
 
 function ImmutableTreeWrapper() {
+    // noinspection JSUnusedGlobalSymbols
     this.tree = new ImmutableTree();
 }
 
-ImmutableTreeWrapper.prototype.insert = function (val) {
-    this.tree = this.tree.insert(val);
-};
+ImmutableTreeWrapper.prototype.remove = AVLTreeWrapper.prototype.delete;
 
-ImmutableTreeWrapper.prototype.extractMin = function () {
-    let min = this.tree._minValueNode().val;
-    this.tree = this.tree._remove(min);
-    return min;
-};
+ImmutableTreeWrapper.prototype.find = AVLTreeWrapper.prototype.find;
 
-ImmutableTreeWrapper.prototype.construct = function (array) {
-    this.tree.construct(array);
-};
+ImmutableTreeWrapper.prototype.insert = AVLTreeWrapper.prototype.insert;
 
-ImmutableTreeWrapper.prototype.toString = function () {
-    return this.tree.toString();
-};
+ImmutableTreeWrapper.prototype.extractMin = AVLTreeWrapper.prototype.extractMin;
+
+// noinspection JSUnusedGlobalSymbols
+ImmutableTreeWrapper.prototype.construct = AVLTreeWrapper.prototype.construct;
+
+// noinspection JSUnusedGlobalSymbols
+ImmutableTreeWrapper.prototype.toString = AVLTreeWrapper.prototype.toString;
