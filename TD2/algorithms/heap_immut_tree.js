@@ -320,6 +320,8 @@ MinHeap_Immut_Tree.prototype._arrayToTree = function (arr, root, i) {
     return root;
 };
 
+MinHeap_Immut_Tree.prototype.structureName = "ImmutableMinHeapTree";
+
 //BrokenCaseFixVerification
 let minHeapImmutTree = new MinHeap_Immut_Tree();
 minHeapImmutTree.insert(5);

@@ -25,6 +25,7 @@
     <script type="text/javascript" src="algorithms/immutableRbtree.js"></script>
     <script type="text/javascript" src="utils.js"></script>
     <script type="text/javascript" src="definitionsAndTests.js"></script>
+    <script type="text/javascript" src="style.js"></script>
     <script type="text/javascript" src="visualization.js"></script>
 </head>
 <body>
@@ -37,15 +38,27 @@
         <br/>
         <form class="needs-validation" novalidate>
             <div class="form-row">
-                <div class="col-md-4 mb-3">
-                    <label for="iterations">Number of iterations per function</label>
+                <div class="col-md-3 mb-3">
+                    <label for="iterations">Number of iterations per structure</label>
                     <input type="number" class="form-control" id="iterations" placeholder="64"
                            value="64" required>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="bailoutTime">Number of milliseconds before bailout</label>
+                <div class="col-md-3 mb-3">
+                    <label for="bailoutTime">Milliseconds before bailout</label>
                     <input type="number" class="form-control" id="bailoutTime" placeholder="32"
                            value="32" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="dStruct">Data structures</label>
+                    <select id="dStruct" class="custom-select">
+                        <option value="0">Priority Queues</option>
+                        <option value="1">Trees</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="methods">Operation to test</label>
+                    <select id="methods" class="custom-select">
+                    </select>
                 </div>
             </div>
             <br/>

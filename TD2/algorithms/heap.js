@@ -78,3 +78,5 @@ MinHeap.prototype._swap = function (i, j) {
     this.data[j] = temp;
 };
 
+MinHeap.prototype.structureName = "MinHeap";
+

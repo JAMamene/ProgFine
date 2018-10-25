@@ -180,7 +180,7 @@ function ImmutableTreeWrapper() {
     this.tree = new ImmutableTree();
 }
 
-ImmutableTreeWrapper.prototype.remove = AVLTreeWrapper.prototype.delete;
+ImmutableTreeWrapper.prototype.remove = AVLTreeWrapper.prototype.remove;
 
 ImmutableTreeWrapper.prototype.find = AVLTreeWrapper.prototype.find;
 
@@ -193,3 +193,5 @@ ImmutableTreeWrapper.prototype.construct = AVLTreeWrapper.prototype.construct;
 
 // noinspection JSUnusedGlobalSymbols
 ImmutableTreeWrapper.prototype.toString = AVLTreeWrapper.prototype.toString;
+
+ImmutableTreeWrapper.prototype.structureName = "ImmutableAVLTree";

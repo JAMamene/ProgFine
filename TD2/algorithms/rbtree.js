@@ -290,3 +290,5 @@ RBTree.prototype.find = function (val) {
 
     return _find(this._root, val);
 };
+
+RBTree.prototype.structureName = "RedBlackTree";

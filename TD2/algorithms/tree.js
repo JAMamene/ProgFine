@@ -197,7 +197,7 @@ AVLTreeWrapper.prototype.find = function (val) {
         }
     }
 
-    return _find(tree, val);
+    return _find(this.tree, val);
 };
 
 AVLTreeWrapper.prototype.remove = function (val) {
@@ -226,3 +226,5 @@ AVLTreeWrapper.prototype.toString = function () {
     if (this.tree === null) return new AVLTree().toString();
     return this.tree.toString();
 };
+
+AVLTreeWrapper.prototype.structureName = "AVLTree";

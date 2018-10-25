@@ -145,7 +145,6 @@ ImmutableRBTree.prototype.extractMin = function () {
 ImmutableRBTree.prototype.remove = function (val) {
 
     function minNode(node) {
-        console.log(node.toString());
         if (node.left === null) {
             return node;
         } else return minNode(node.left);
@@ -218,4 +217,7 @@ ImmutableRBTree.prototype.toString = function () {
 
 ImmutableRBTree.prototype.construct = RBTree.prototype.construct;
 ImmutableRBTree.prototype.find = RBTree.prototype.find;
+
+ImmutableRBTree.prototype.structureName = "ImmutableRedBlackTree";
+
 

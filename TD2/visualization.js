@@ -2,11 +2,14 @@ $(function () {
     // Feeds values of the form to benchmark when runBench is clicked
     $("#runBench").click(function (e) {
         e.preventDefault();
+        let method = $("#methods").val();
         let bailoutTime = $("#bailoutTime").val();
         let iterations = $("#iterations").val();
+        let dStruct = Structures[$("#dStruct").val()];
+        console.log("method : " + method);
         console.log("bailout : " + bailoutTime);
         console.log("iterations : " + iterations);
-        runBench("insert", iterations, bailoutTime);
+        runBench(method, iterations, bailoutTime, dStruct);
     });
 });
 
@@ -22,44 +25,68 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
         let t1;
         let arr;
         let dataType = new DataType();
-        switch (funcToTest) {
-            case "construct":
-                arr = shuffle(entrySize);
-                t0 = performance.now();
-                dataType[funcToTest](arr);
-                t1 = performance.now();
-                break;
-            case "insert":
-                arr = shuffle(entrySize);
-                t0 = performance.now();
-                for (let i = 0; i < entrySize; i++) {
-                    dataType[funcToTest](arr[i]);
-                }
-                t1 = performance.now();
-                break;
-            case "extractMin":
-                arr = shuffle(entrySize);
-                dataType.construct(arr);
-                t0 = performance.now();
-                for (let i = 0; i < entrySize; i++) {
-                    dataType[funcToTest]();
-                }
-                t1 = performance.now();
-                break;
-            default:
-                console.error("invalid function to test " + funcToTest);
-                break;
+        try {
+            switch (funcToTest) {
+                case "construct":
+                    arr = shuffle(entrySize);
+                    t0 = performance.now();
+                    dataType[funcToTest](arr);
+                    t1 = performance.now();
+                    break;
+                case "insert":
+                    arr = shuffle(entrySize);
+                    t0 = performance.now();
+                    for (let i = 0; i < entrySize; i++) {
+                        dataType[funcToTest](arr[i]);
+                    }
+                    t1 = performance.now();
+                    break;
+                case "extractMin":
+                    arr = shuffle(entrySize);
+                    dataType.construct(arr);
+                    t0 = performance.now();
+                    for (let i = 0; i < entrySize; i++) {
+                        dataType[funcToTest]();
+                    }
+                    t1 = performance.now();
+                    break;
+                case "remove":
+                    arr = shuffle(entrySize);
+                    dataType.construct(arr);
+                    t0 = performance.now();
+                    for (let i = 0; i < entrySize-1; i++) {
+                        dataType[funcToTest](arr[i]);
+                    }
+                    t1 = performance.now();
+                    break;
+                case "find":
+                    arr = shuffle(entrySize);
+                    dataType.construct(arr);
+                    t0 = performance.now();
+                    for (let i = 0; i < entrySize-1; i++) {
+                        dataType[funcToTest](arr[i]);
+                    }
+                    t1 = performance.now();
+                    break;
+                default:
+                    console.error("invalid function to test " + funcToTest);
+                    break;
+            }
+        }
+        catch (e) {
+            console.error(e);
+            return null;
         }
 
 
         // If exec time was too long and the chance was used then return null
         if ((t1 - t0) > maxMillis) {
             if (oneChance) {
-                console.log(DataType.name + " WARNING at " + entrySize);
+                console.log(new DataType().structureName + " WARNING at " + entrySize);
                 oneChance = false;
             }
             else {
-                console.log(DataType.name + " FAILED at " + entrySize);
+                console.log(new DataType().structureName + " FAILED at " + entrySize);
                 return null;
             }
         }
@@ -72,12 +99,12 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
 /**
  * Computation of exec times and creation of the graphs
  * @param funcToTest {string} the member function to test (extractMin, insert, construct)
- * @param iterations the number of times each algorithm will be fired for each n
- * @param bailoutTime the milliseconds before an algorithm execution is aborted
+ * @param iterations {number} the number of times each algorithm will be fired for each n
+ * @param bailoutTime {number} the milliseconds before an algorithm execution is aborted
+ * @param family {array} the selected Datastructures, an array containing the different objects to experiment on
  */
-function runBench(funcToTest, iterations, bailoutTime) {
-    let selectedAlgs = PriorityQueues;
-    console.log(PriorityQueues);
+function runBench(funcToTest, iterations, bailoutTime, family) {
+    let selectedDataStructures = family;
     // The different tab size to experiment on
     let ns = [2, 4, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767 /*, 65535*/];
     let bailoutTimeMS = bailoutTime;
@@ -86,7 +113,7 @@ function runBench(funcToTest, iterations, bailoutTime) {
     // The values for the scatterChart
     let valuesScatter = new Array(ns.length - warmupOffset);
     // The candleChart array
-    let candleCharts = new Array(selectedAlgs.length);
+    let candleCharts = new Array(selectedDataStructures.length);
     for (let i = 0; i < candleCharts.length; i++) {
         candleCharts[i] = [];
     }
@@ -97,14 +124,14 @@ function runBench(funcToTest, iterations, bailoutTime) {
         $(".progress-bar").css("width", ((entrySizeIndex + 1) / ns.length) * 100 + "%").attr("aria-valuenow", entrySizeIndex).text(ns[entrySizeIndex]);
         console.log(ns[entrySizeIndex]);
         // Initialize the data for an entrySize on the scatterChart
-        let datumScatter = new Array(selectedAlgs.length + 1);
+        let datumScatter = new Array(selectedDataStructures.length + 1);
         datumScatter[0] = Math.log2(ns[entrySizeIndex]);
         // Run all algorithms
-        for (let algIndex = 0; algIndex < selectedAlgs.length; algIndex++) {
+        for (let algIndex = 0; algIndex < selectedDataStructures.length; algIndex++) {
             let datumCandle = new Array(5);
 
             // Measure times for the selected algorithm and array size
-            let times = measureTimes(selectedAlgs[algIndex], ns[entrySizeIndex], iterations, bailoutTimeMS, funcToTest);
+            let times = measureTimes(selectedDataStructures[algIndex], ns[entrySizeIndex], iterations, bailoutTimeMS, funcToTest);
 
             // if times is null then the execution failed and we don't add the values to the charts
             if (entrySizeIndex >= warmupOffset && times != null) {
@@ -155,10 +182,10 @@ function runBench(funcToTest, iterations, bailoutTime) {
 
 
         // Add legend to every column of the values of scatter
-        let legend = new Array(selectedAlgs.length + 1);
+        let legend = new Array(selectedDataStructures.length + 1);
         legend[0] = "Size";
-        for (let i = 1; i <= selectedAlgs.length; i++) {
-            legend[i] = selectedAlgs[i - 1].name;
+        for (let i = 1; i <= selectedDataStructures.length; i++) {
+            legend[i] = new selectedDataStructures[i - 1]().structureName;
         }
         valuesScatter.unshift(legend);
         let dataScatter = google.visualization.arrayToDataTable(
@@ -172,7 +199,7 @@ function runBench(funcToTest, iterations, bailoutTime) {
             visibleInLegend: true
         };
         let trendlines = {};
-        for (let i = 0; i < selectedAlgs.length; i++) {
+        for (let i = 0; i < selectedDataStructures.length; i++) {
             trendlines[i] = trendline;
         }
         let optionsScatter = {
@@ -211,9 +238,11 @@ function runBench(funcToTest, iterations, bailoutTime) {
 
 
         // Generate a CandleChart for each algorithm
-        for (let i = 0; i < selectedAlgs.length; i++) {
+        for (let i = 0; i < selectedDataStructures.length; i++) {
 
             let currentChart = candleCharts[i];
+
+            let structName = new selectedDataStructures[i]().structureName;
 
             //handle a hole in the values
             while (sparseIndex(currentChart) !== false) {
@@ -223,7 +252,7 @@ function runBench(funcToTest, iterations, bailoutTime) {
             let dataCandle = google.visualization.arrayToDataTable(currentChart, true);
 
             let optionsCandle = {
-                title: "Algorithm " + selectedAlgs[i].name + " execution times",
+                title: funcToTest + " on " + structName + " execution times",
                 legend: 'none',
                 width: 950,
                 height: 450,
@@ -243,14 +272,14 @@ function runBench(funcToTest, iterations, bailoutTime) {
             // Create tabs navigation for each sorting algorithm and append the values
             $("#algo-tabs").append("" +
                 "<li class=\"nav-item\">\n" +
-                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + selectedAlgs[i].name + "\" role=\"tab\"\n" +
-                "                   aria-controls=\"#chart-candle" + selectedAlgs[i].name + "\" aria-selected=\"true\">" + selectedAlgs[i].name + "</a>\n" +
+                "    <a class=\"nav-link\" id=\"tab-chart-candle\" data-toggle=\"pill\" href=\"#chart-candle" + structName + "\" role=\"tab\"\n" +
+                "                   aria-controls=\"#chart-candle" + structName + "\" aria-selected=\"true\">" + structName + "</a>\n" +
                 "</li>\n");
             $("#algo-contents").append("" +
-                "<div class=\"tab-pane fade\" id=\"chart-candle" + selectedAlgs[i].name + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + selectedAlgs[i].name + "\">" +
-                "    <div class=\"container\"><div id=\"chartCandle" + selectedAlgs[i].name + "\" style=\"height: 450px; width: 950px; margin: auto\"></div></div>" +
+                "<div class=\"tab-pane fade\" id=\"chart-candle" + structName + "\" role=\"tabpanel\" aria-labelledby=\"tab-chart-candle" + structName + "\">" +
+                "    <div class=\"container\"><div id=\"chartCandle" + structName + "\" style=\"height: 450px; width: 950px; margin: auto\"></div></div>" +
                 "</div>");
-            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + selectedAlgs[i].name)[0]);
+            let chartCandle = new google.visualization.CandlestickChart($("#chartCandle" + structName)[0]);
             chartCandle.draw(dataCandle, optionsCandle);
         }
     }
