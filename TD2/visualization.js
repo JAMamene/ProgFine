@@ -174,7 +174,7 @@ function runBench(funcToTest, iterations, bailoutTime, family) {
 
     function drawChart() {
         // Erase current ScatterChart and create a new one
-        $("#chartArea").empty().append("<div id=\"chartLinear\" style=\"width: 100%\"></div>\n");
+        $("#chartArea").empty().append("<div id=\"chartLinear\" style=\"width: 80%\"></div>\n");
         $("#chartLinear").after(" <div class=\"container-fluid\">\n" +
             "        <ul class=\"nav nav-pills center-pills\" id=\"algo-tabs\" role=\"tablist\"></ul>\n" +
             "        <div class=\"tab-content\" id=\"algo-contents\"/>\n" +
@@ -203,7 +203,7 @@ function runBench(funcToTest, iterations, bailoutTime, family) {
             trendlines[i] = trendline;
         }
         let optionsScatter = {
-            title: 'Different sorting algorithm sorting speed by entry size',
+            title: 'Speed by entry size',
             chartArea: {
                 width: '70%',
                 right: '26%'

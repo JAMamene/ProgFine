@@ -42,7 +42,7 @@ PriorityQueues.forEach((elem) => {
     console.assert(new elem().implements(IPriorityQueue));
 });
 
-let Trees = [AVLTreeWrapper, RBTree, ImmutableRBTree, ImmutableTreeWrapper]
+let Trees = [AVLTreeWrapper, RBTree, ImmutableRBTree, ImmutableTreeWrapper];
 
 // Check that each Trees implements the interface
 Trees.forEach((elem) => {
@@ -73,3 +73,79 @@ PriorityQueues.forEach((elem) => {
         console.assert(structure.extractMin() === i, structure.constructor.name, "\n" + structure.toString());
     }
 });
+
+TreeTest(AVLTreeWrapper, checkAVLNode, "tree");
+TreeTest(ImmutableTreeWrapper, checkAVLNode, "tree");
+TreeTest(RBTree, checkRbNode, "_root");
+TreeTest(ImmutableRBTree, checkRbNode, "_root");
+
+function TreeTest(structure, checker, rootName) {
+    let wrapper = new structure();
+    let n = 100;
+    let arr = shuffle(n);
+    wrapper.construct(arr);
+    checker(wrapper[rootName]);
+    wrapper = new structure();
+    for (let i = 0; i < n; i++) {
+        wrapper.insert(arr[i]);
+    }
+    checker(wrapper[rootName]);
+}
+
+function checkAVLNode(node) {
+    if (node.left !== null) {
+        console.assert(node.left.val < node.val);
+        checkAVLNode(node.left);
+    }
+    if (node.right !== null) {
+        console.assert(node.right.val > node.val);
+        checkAVLNode(node.right);
+    }
+    if (node.left == null && node.right == null) {
+        console.assert(node.height === 1);
+    }
+    let balance = Math.abs((node.left === null ? 0 : node.left.height) -
+        (node.right === null ? 0 : node.right.height));
+    console.assert(balance === 0 || balance === 1);
+}
+
+function checkRbNode(node, parent) {
+    if (parent === undefined) {
+        console.assert(!node.red);
+        let arr = [];
+        buildPaths(node, arr, 0);
+        let val = arr[0];
+        for (let i = 0; i < arr.length; i++) {
+            console.assert(val === arr[i]);
+        }
+    }
+    if (node.left !== null) {
+        console.assert(node.left.data < node.data);
+        checkRbNode(node.left, this);
+    }
+    if (node.right !== null) {
+        console.assert(node.right.data > node.data);
+        checkRbNode(node.right, this);
+    }
+    if (parent !== undefined) {
+        if (node.red = true) {
+            console.assert(!parent.red);
+        }
+    }
+}
+
+function buildPaths(node, arr, count) {
+    if (!node.red) {
+        count++;
+    }
+    if (node.right === null && node.left === null) {
+        arr.push(count);
+        return;
+    }
+    if (node.right !== null) {
+        buildPaths(node.right, arr, count);
+    }
+    if (node.left !== null) {
+        buildPaths(node.left, arr, count);
+    }
+}

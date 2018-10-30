@@ -11,7 +11,6 @@ $(function () {
         let options = [];
         let src = [];
         if ($("#dStruct").val() === "0") {
-            console.log("PQ");
             src = pQueueMethods;
         }
         else if ($("#dStruct").val() === "1") {
