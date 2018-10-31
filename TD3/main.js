@@ -4,14 +4,14 @@ let lines;
 let fpsStack = [];
 let fps;
 let grid;
-const n = 200;
+const n = 300;
 $(function () {
     canvas = $("#canvas")[0];
     let size = 80;
     context = canvas.getContext('2d');
     lines = [];
     for (let i = 0; i < n; i++) {
-        lines.push(new Line(
+        lines.push(new LineMask(
             Math.floor(Math.random() * (canvas.width - size) + size / 2),
             Math.floor(Math.random() * (canvas.height - size) + size / 2),
             Math.floor(Math.random() * 2 + 1),
@@ -23,8 +23,8 @@ $(function () {
         ));
     }
     grid = new Grid(16, 16, 40, lines);
-    // lines.push(new Line(500, 500, 2, 10, 45, 1, size, 1));
-    // lines.push(new Line(200, 200, 2, 10, 45, 1, size, 2));
+    // lines.push(new LineMask(500, 500, 2, 10, 45, 1, size, 1));
+    // lines.push(new LineMask(200, 200, 2, 10, 45, 1, size, 2));
     window.requestAnimationFrame(update);
 });
 
@@ -45,8 +45,8 @@ function update() {
     //         context.fill();
     //     }
     // });
-    for (let i = 0; i < lines.length; i++) {
-        for (let j = i; j < lines.length; j++) {
+    for (let i = 0; i < lines.length - 1; i++) {
+        for (let j = i + 1; j < lines.length; j++) {
             let point = (lines[i].intersect(lines[j]));
             if (point) {
                 context.rect(point.x, point.y, 1, 1);
