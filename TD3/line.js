@@ -17,13 +17,10 @@ Point = function (x, y) {
 Line.prototype.draw = function (ctx) {
     ctx.beginPath();
     ctx.moveTo(this.center.x, this.center.y);
-    this.updateFirstEnd();
-    this.updateSecondEnd();
     ctx.lineTo(this.firstEnd.x, this.firstEnd.y);
     ctx.moveTo(this.center.x, this.center.y);
     ctx.lineTo(this.secondEnd.x, this.secondEnd.y);
     ctx.stroke();
-    this.checkForCollision(ctx);
 };
 
 Line.prototype.updateFirstEnd = function () {
@@ -36,8 +33,27 @@ Line.prototype.updateSecondEnd = function () {
     this.secondEnd.y = this.center.y - this.size / 2 * Math.sin(this.rotation);
 };
 
-Line.prototype.checkForCollision = function (ctx) {
-
+Line.prototype.checkForCollision = function (canvas) {
+    // this.angle = ((this.angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+    // this.rotationAngle = ((this.rotationAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+    // console.log(canvas.height);
+    // console.log(this.firstEnd.y);
+    if (this.firstEnd.x <= 0 || this.secondEnd.x <= 0) {
+        this.angle = Math.PI - this.angle;
+        this.rotationAngle = -this.rotationAngle;
+    }
+    else if (this.firstEnd.x >= canvas.width || this.secondEnd.x >= canvas.width) {
+        this.angle = -Math.PI - this.angle;
+        this.rotationAngle = -this.rotationAngle;
+    }
+    else if (this.firstEnd.y <= 0 || this.secondEnd.y <= 0) {
+        this.angle = -this.angle;
+        this.rotationAngle = -this.rotationAngle;
+    }
+    else if (this.firstEnd.y >= canvas.height || this.secondEnd.y >= canvas.height) {
+        this.angle = -this.angle;
+        this.rotationAngle = -this.rotationAngle;
+    }
 };
 
 Line.prototype.intersect = function (other) {
@@ -76,9 +92,12 @@ Line.prototype.intersect = function (other) {
 };
 
 
-Line.prototype.update = function (ctx) {
+Line.prototype.update = function (ctx, canvas) {
+    this.checkForCollision(canvas);
     this.center.x += this.speed * Math.cos(this.angle);
     this.center.y += this.speed * Math.sin(this.angle);
     this.rotation += this.rotationAngle;
+    this.updateFirstEnd();
+    this.updateSecondEnd();
     this.draw(ctx);
 };
