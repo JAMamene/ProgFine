@@ -113,7 +113,7 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
 function runBench(funcToTest, iterations, bailoutTime, family) {
     let selectedDataStructures = family;
     // The different tab size to experiment on
-    let ns = [2, 4, 7, 15, 31, 45, 90, 180, 360, 720, 1440, 2880, 5760, 11520, 23040 /*, 65535*/];
+    let ns = [2, 4, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767 /*, 65535*/];
     let bailoutTimeMS = bailoutTime;
     // The number of ignored ns (the x first one), reason is for warmup and because time of small tabs arre inconsistent
     let warmupOffset = 7;
