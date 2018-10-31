@@ -3,24 +3,28 @@ let context;
 let lines;
 let fpsStack = [];
 let fps;
-const n = 100;
+let grid;
+const n = 200;
 $(function () {
     canvas = $("#canvas")[0];
-    let size = 150;
+    let size = 80;
     context = canvas.getContext('2d');
     lines = [];
     for (let i = 0; i < n; i++) {
         lines.push(new Line(
             Math.floor(Math.random() * (canvas.width - size) + size / 2),
             Math.floor(Math.random() * (canvas.height - size) + size / 2),
-            Math.floor(Math.random() * 3 + 1),
+            Math.floor(Math.random() * 2 + 1),
             Math.floor(Math.random() * 360),
             Math.floor(Math.random() * 360),
-            Math.floor((Math.random() * 4 + 1)),
-            size
+            Math.floor((Math.random() * 2 + 1)),
+            size,
+            i
         ));
     }
-    //lines.push(new Line(500, 500, 2, 10, 45, 1, size));
+    grid = new Grid(16, 16, 40, lines);
+    // lines.push(new Line(500, 500, 2, 10, 45, 1, size, 1));
+    // lines.push(new Line(200, 200, 2, 10, 45, 1, size, 2));
     window.requestAnimationFrame(update);
 });
 
@@ -31,17 +35,28 @@ function update() {
     lines.forEach(line => {
         line.update(context, canvas);
     });
-    window.requestAnimationFrame(update);
+    let time = performance.now();
+    // grid.update();
+    // grid.getCollisions().forEach(pair => {
+    //     let point = (pair[0].intersect(pair[1]));
+    //     if (point) {
+    //         context.rect(point.x, point.y, 1, 1);
+    //         context.fillStyle = "red";
+    //         context.fill();
+    //     }
+    // });
     for (let i = 0; i < lines.length; i++) {
         for (let j = i; j < lines.length; j++) {
             let point = (lines[i].intersect(lines[j]));
             if (point) {
-                context.rect(point.x - 1, point.y - 1, 2, 2);
+                context.rect(point.x, point.y, 1, 1);
                 context.fillStyle = "red";
                 context.fill();
             }
         }
     }
+    let final = performance.now();
+    //console.log(final - time);
     if (fpsStack.length < 30) {
         fpsStack.push(performance.now());
     }
@@ -51,10 +66,9 @@ function update() {
         }
         fpsStack[fpsStack.length - 1] = performance.now() - fpsStack[fpsStack.length - 1];
         fps = average(fpsStack) / 1000;
-        console.log(fps);
-        console.log(fpsStack);
         fpsStack = [];
     }
+    window.requestAnimationFrame(update);
 }
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;

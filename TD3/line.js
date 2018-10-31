@@ -1,4 +1,4 @@
-Line = function (centerX, centerY, speed, angle, rotation, rotationAngle, size) {
+Line = function (centerX, centerY, speed, angle, rotation, rotationAngle, size, id) {
     this.center = new Point(centerX, centerY);
     this.speed = speed;
     this.angle = Math.PI * angle / 180.0;
@@ -7,6 +7,7 @@ Line = function (centerX, centerY, speed, angle, rotation, rotationAngle, size) 
     this.size = size;
     this.firstEnd = new Point();
     this.secondEnd = new Point();
+    this.id = id;
 };
 
 Point = function (x, y) {
@@ -34,10 +35,6 @@ Line.prototype.updateSecondEnd = function () {
 };
 
 Line.prototype.checkForCollision = function (canvas) {
-    // this.angle = ((this.angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    // this.rotationAngle = ((this.rotationAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    // console.log(canvas.height);
-    // console.log(this.firstEnd.y);
     if (this.firstEnd.x <= 0 || this.secondEnd.x <= 0) {
         this.angle = Math.PI - this.angle;
         this.rotationAngle = -this.rotationAngle;
