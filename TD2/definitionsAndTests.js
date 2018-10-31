@@ -65,7 +65,7 @@ PriorityQueues.forEach((elem) => {
     console.assert(structure.extractMin() === 9, structure.constructor.name, "\n" + structure.toString());
     structure = new elem();
     let n = 31;
-    let arr = shuffle(n);
+    let arr = shuffledArr(n);
     for (let i = 0; i < n; i++) {
         structure.insert(arr[i]);
     }

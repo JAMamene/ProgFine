@@ -1,0 +1,8 @@
+.center-pills {
+    display: flex;
+    justify-content: center;
+}
+
+#footeer {
+    height: 200px;
+}

@@ -1,15 +1,24 @@
 /**
- * Shuffles array in place. ES6 version
+ * Shuffles array in place.
  * @param {number} size size of the array.
  * @return {Array} a the shuffled array
  */
-function shuffle(size) {
+function shuffledArr(size) {
     let a = Array.from({length: size}, (v, k) => k);
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+}
+
+/**
+ * Returns a sorted array
+ * @param {number} size size of the array.
+ * @return {Array} a the sorted array
+ */
+function sortedArr(size) {
+    return Array.from({length: size}, (v, k) => size - k);
 }
 
 /**

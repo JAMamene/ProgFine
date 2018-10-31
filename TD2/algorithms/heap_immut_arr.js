@@ -94,17 +94,3 @@ MinHeap_Immut_Arr_Wrapper.prototype.toString = function () {
 };
 
 MinHeap_Immut_Arr_Wrapper.prototype.structureName = "ImmutableMinHeapArray";
-
-
-//
-// let heap = new MinHeap_Immut_Arr_Wrapper();
-// heap.construct([1, 3, 4, 5, 6, 2, 9, 10]);
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());
-// console.log(heap.extractMin());
-// console.log(heap.toString());

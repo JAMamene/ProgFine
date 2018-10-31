@@ -13,7 +13,14 @@ $(function () {
     });
 });
 
-
+/**
+ * Time measurement handling
+ * @param DataType {IPriorityQueue|ITree} the current datastructure to bench (minheap, tree...)
+ * @param entrySize {number} the size of n (typically number of item to insert or remove)
+ * @param iterations {number} the number of times each algorithm will be fired for each n
+ * @param maxMillis {number} the milliseconds before an algorithm execution is aborted
+ * @param funcToTest {String} the selected function to experiment on (insert, remove...)
+ */
 function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
     let times = new Array(iterations);
     let oneChance = true;
@@ -28,13 +35,13 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
         try {
             switch (funcToTest) {
                 case "construct":
-                    arr = shuffle(entrySize);
+                    arr = shuffledArr(entrySize);
                     t0 = performance.now();
                     dataType[funcToTest](arr);
                     t1 = performance.now();
                     break;
                 case "insert":
-                    arr = shuffle(entrySize);
+                    arr = shuffledArr(entrySize);
                     t0 = performance.now();
                     for (let i = 0; i < entrySize; i++) {
                         dataType[funcToTest](arr[i]);
@@ -42,7 +49,7 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
                     t1 = performance.now();
                     break;
                 case "extractMin":
-                    arr = shuffle(entrySize);
+                    arr = shuffledArr(entrySize);
                     dataType.construct(arr);
                     t0 = performance.now();
                     for (let i = 0; i < entrySize; i++) {
@@ -51,19 +58,19 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
                     t1 = performance.now();
                     break;
                 case "remove":
-                    arr = shuffle(entrySize);
+                    arr = shuffledArr(entrySize);
                     dataType.construct(arr);
                     t0 = performance.now();
-                    for (let i = 0; i < entrySize-1; i++) {
+                    for (let i = 0; i < entrySize - 1; i++) {
                         dataType[funcToTest](arr[i]);
                     }
                     t1 = performance.now();
                     break;
                 case "find":
-                    arr = shuffle(entrySize);
+                    arr = shuffledArr(entrySize);
                     dataType.construct(arr);
                     t0 = performance.now();
-                    for (let i = 0; i < entrySize-1; i++) {
+                    for (let i = 0; i < entrySize - 1; i++) {
                         dataType[funcToTest](arr[i]);
                     }
                     t1 = performance.now();
@@ -106,7 +113,7 @@ function measureTimes(DataType, entrySize, iterations, maxMillis, funcToTest) {
 function runBench(funcToTest, iterations, bailoutTime, family) {
     let selectedDataStructures = family;
     // The different tab size to experiment on
-    let ns = [2, 4, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767 /*, 65535*/];
+    let ns = [2, 4, 7, 15, 31, 45, 90, 180, 360, 720, 1440, 2880, 5760, 11520, 23040 /*, 65535*/];
     let bailoutTimeMS = bailoutTime;
     // The number of ignored ns (the x first one), reason is for warmup and because time of small tabs arre inconsistent
     let warmupOffset = 7;
@@ -203,7 +210,7 @@ function runBench(funcToTest, iterations, bailoutTime, family) {
             trendlines[i] = trendline;
         }
         let optionsScatter = {
-            title: 'Different sorting algorithm sorting speed by entry size',
+            title: 'Speed by Entry Size',
             chartArea: {
                 width: '70%',
                 right: '26%'

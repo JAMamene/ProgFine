@@ -51,6 +51,14 @@ MinHeap_Immut_Tree.prototype.extractMin = function () {
     return min;
 };
 
+// Minheap implementation
+MinHeap_Immut_Tree.prototype.construct = function (array) {
+    let minheap = new MinHeap();
+    minheap.construct(array);
+    this.root = this._arrayToTree(minheap.data, this.root, 0);
+};
+
+
 // Bad n log n implementation
 MinHeap_Immut_Tree.prototype.construct2 = function (array) {
     array.sort(function (a, b) {
@@ -78,7 +86,7 @@ MinHeap_Immut_Tree.prototype.construct2 = function (array) {
     this.nbNode = array.length;
 };
 
-MinHeap_Immut_Tree.prototype.construct = function (array) {
+MinHeap_Immut_Tree.prototype.construct3 = function (array) {
     this.nbNode = array.length;
     this.root = this._arrayToTree(array, this.root, 0);
     let piv = Math.floor(this.nbNode / 2);
@@ -146,6 +154,8 @@ MinHeap_Immut_Tree.prototype._getToNode = function (id) {
     return [parent, node, isLeft];
 };
 
+
+// Not fully immutable whoops
 MinHeap_Immut_Tree.prototype._insertLastNode = function (val) {
     let path = ((this.nbNode + 1) >>> 0).toString(2).substring(1);
     let node = this.root;
@@ -347,6 +357,3 @@ minHeapImmutTree.extractMin();
 minHeapImmutTree.extractMin();
 console.assert(minHeapImmutTree.root.left.right.val === 14, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
 console.assert(minHeapImmutTree.root.left.right.right.val === 26, minHeapImmutTree.constructor.name, "\n" + minHeapImmutTree.toString());
-
-// minHeapImmutTree.construct([10, 39, 47, 27, 46, 129, 7, 2, 4, 3, 9, 8, 1, 12, 78, 13, 14, 15]);
-// console.log(minHeapImmutTree.toString());
