@@ -1,8 +1,9 @@
-.center-pills {
-    display: flex;
-    justify-content: center;
-}
-
-#footeer {
-    height: 200px;
+#canvas {
+    background-color: azure;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 800px;
 }
