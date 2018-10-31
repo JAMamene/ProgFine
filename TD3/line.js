@@ -9,6 +9,7 @@ Line = function (centerX, centerY, speed, angle, rotation, rotationAngle, size) 
 };
 
 Line.prototype.draw = function (ctx) {
+    ctx.beginPath();
     ctx.moveTo(this.centerX, this.centerY);
     ctx.lineTo(
         this.centerX + this.size / 2 * Math.cos(this.rotation), this.centerY + this.size / 2 * Math.sin(this.rotation)
@@ -20,8 +21,9 @@ Line.prototype.draw = function (ctx) {
     ctx.stroke();
 };
 
-Line.prototype.update = function () {
-    this.centerX += this.angle * this.speed;
-    this.centerY += this.angle * this.speed;
+Line.prototype.update = function (ctx) {
+    this.centerX += this.speed * Math.cos(this.angle);
+    this.centerY += this.speed * Math.sin(this.angle);
     this.rotation += this.rotationAngle;
+    this.draw(ctx);
 };
