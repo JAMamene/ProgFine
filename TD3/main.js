@@ -2,8 +2,7 @@ let canvas;
 let context;
 let lines;
 let n;
-let size = 39;
-let threshold = 32;
+let size = 40;
 let fpsStack = [];
 let fps;
 let grid;
@@ -11,6 +10,7 @@ let tree;
 let algorithm;
 let timerId = 0;
 let running = false;
+let gridDebug = false;
 $(function () {
     // Feeds values of the form to benchmark when runBench is clicked
     $("#runBench").click(function (e) {
@@ -37,10 +37,10 @@ function startVisualization() {
             lines.push(new Line(
                 Math.floor(Math.random() * (canvas.width - size) + size / 2),
                 Math.floor(Math.random() * (canvas.height - size) + size / 2),
-                Math.floor(Math.random() * 2 + 1),
+                Math.random() * 2 + 0.1,
                 Math.floor(Math.random() * 360),
                 Math.floor(Math.random() * 360),
-                Math.floor((Math.random() * 2 + 1)),
+                Math.random() * 2 + 0.1,
                 size,
             ));
         }
@@ -48,21 +48,20 @@ function startVisualization() {
             lines.push(new LineMask(
                 Math.floor(Math.random() * (canvas.width - size) + size / 2),
                 Math.floor(Math.random() * (canvas.height - size) + size / 2),
-                Math.floor(Math.random() * 2 + 1),
+                Math.random() * 2 + 0.1,
                 Math.floor(Math.random() * 360),
                 Math.floor(Math.random() * 360),
-                Math.floor((Math.random() * 2 + 1)),
+                Math.random() * 2 + 0.1,
                 size,
             ));
         }
     }
-    grid = new Grid(32, 32, 80, lines);
-    // lines.push(new LineMask(500, 500, 2, 10, 45, 1, size, 1));
-    // lines.push(new LineMask(200, 200, 2, 10, 45, 1, size, 2));
+    grid = new Grid(canvas.width / (size / 2), size, lines);
     timerId = window.requestAnimationFrame(update);
 }
 
 function update() {
+    gridDebug = $("#gridDebug").is(':checked');
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.font = "20px Arial";
     context.fillText("FPS : " + Math.floor(1 / fps) + " , Shapes : " + n, 10, 20);
@@ -72,7 +71,7 @@ function update() {
 
     computeCollisions(algorithm);
 
-    if (fpsStack.length < 30) {
+    if (fpsStack.length < 10) {
         fpsStack.push(performance.now());
     }
     else {
@@ -101,11 +100,14 @@ function computeCollisions(algorithm) {
             }
             break;
         case "grid":
+            if (gridDebug) {
+                grid.draw(context);
+            }
             grid.resolveCollisions(context);
             break;
         case "quad":
             let quads = [];
-            quads.push(new Quad(0, 0, canvas.width, lines));
+            quads.push(new Quad(0, 0, canvas.width, lines, 32));
             for (; ;) {
                 let len = quads.length;
                 for (let i = 0; i < len; i++) {
@@ -115,11 +117,18 @@ function computeCollisions(algorithm) {
                 if (len === quads.length) break;
             }
             quads.forEach(quad => {
+                if (gridDebug) {
+                    context.beginPath();
+                    context.moveTo(quad.x, quad.y);
+                    context.lineTo(quad.x + quad.width, quad.y);
+                    context.lineTo(quad.x + quad.width, quad.y + quad.width);
+                    context.stroke();
+                }
                 for (let i = 0; i < quad.lines.length; i++) {
                     for (let j = i + 1; j < quad.lines.length; j++) {
                         let point = (quad.lines[i].intersect(quad.lines[j]));
                         if (point) {
-                            context.fillRect(point.x, point.y, 2, 2);
+                            context.fillRect(point.x - 1, point.y - 1, 2, 2);
                         }
                     }
                 }

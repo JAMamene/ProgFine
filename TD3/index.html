@@ -27,15 +27,21 @@
     <div class="container">
         <form class="needs-validation" novalidate>
             <div class="form-row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <label for="alg">Algorithm</label>
                     <select id="alg" class="custom-select">
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <label for="lineNumber">Number of lines</label>
                     <input type="number" class="form-control" id="lineNumber" placeholder="1000"
                            value="1000" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-check-label" for="gridDebug">
+                        Grid visualization
+                    </label>
+                    <input class="form-check-input form-control" type="checkbox" value="" id="gridDebug">
                 </div>
             </div>
             <br/>

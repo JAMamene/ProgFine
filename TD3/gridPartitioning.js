@@ -1,7 +1,6 @@
-function Grid(width, height, cellSize, lines) {
+function Grid(size, cellSize, lines) {
     this.lines = lines;
-    this.width = width;
-    this.height = height;
+    this.size = size;
     this.cellSize = cellSize;
     this.grid = [[]];
 }
@@ -9,7 +8,7 @@ function Grid(width, height, cellSize, lines) {
 
 Grid.prototype.update = function () {
 
-    this.grid = Array(this.width);
+    this.grid = Array(this.size);
 
     for (let i = 0; i < this.lines.length; i++) {
         let line = this.lines[i];
@@ -32,7 +31,7 @@ Grid.prototype.update = function () {
         let cells = [];
         points.forEach(point => {
             if (!this.grid[point.x]) {
-                this.grid[point.x] = Array(this.height);
+                this.grid[point.x] = Array(this.size);
             }
             let gridCol = this.grid[point.x];
             if (!gridCol[point.y]) {
@@ -62,6 +61,28 @@ Grid.prototype.resolveCollisions = function (context) {
                     }
                 }
             }
-        })
+        });
     });
+};
+
+Grid.prototype.draw = function (context) {
+    for (let i = 0; i < this.grid.length; i++) {
+        if (!this.grid[i]) {
+            continue;
+        }
+        for (let j = 0; j < this.grid[i].length; j++) {
+            if (!this.grid[i][j]) {
+                continue;
+            }
+            context.beginPath();
+            let originX = i * this.cellSize;
+            let originY = j * this.cellSize;
+            context.moveTo(originX, originY);
+            context.lineTo(originX + this.cellSize, originY);
+            context.lineTo(originX + this.cellSize, originY + this.cellSize);
+            context.lineTo(originX, originY + this.cellSize);
+            context.lineTo(originX, originY);
+            context.stroke();
+        }
+    }
 };

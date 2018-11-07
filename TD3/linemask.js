@@ -1,6 +1,8 @@
-LineMask = function (centerX, centerY, speed, angle, rotation, rotationAngle, size, id) {
-    this.line = new Line(centerX, centerY, speed, angle, rotation, rotationAngle, size, id);
-    this.mask = id;
+LineMask = function (centerX, centerY, speed, angle, rotation, rotationAngle, size) {
+    this.line = new Line(centerX, centerY, speed, angle, rotation, rotationAngle, size);
+    this.maskX = null;
+    this.maskY = null;
+    this.divider = size / 2;
 };
 
 LineMask.prototype.draw = function (ctx) {
@@ -23,19 +25,19 @@ LineMask.prototype.vectorIntersect = function (other) {
 };
 
 LineMask.prototype.intersect = function (other) {
-    if ((this.mask >>> 16 & other.mask >>> 16) && (this.mask << 16 & other.mask << 16)) {
+    if (this.maskX & other.maskX && this.maskY & other.maskY) {
         return this.line.intersect(other.line);
     }
     return false;
 };
 
 LineMask.prototype.updateMask = function () {
-    this.mask = (1 << (this.line.center.x / 40)
-        | 1 << (16 + this.line.center.y / 40))
-        | 1 << (this.line.firstEnd.x / 40)
-        | 1 << (16 + this.line.firstEnd.y / 40)
-        | 1 << (this.line.secondEnd.x / 40)
-        | 1 << (16 + this.line.firstEnd.y / 40);
+    this.maskX = (1 << (this.line.center.x) / this.divider)
+        | 1 << (this.line.firstEnd.x / this.divider)
+        | 1 << (this.line.secondEnd.x / this.divider);
+    this.maskY = 1 << (this.line.center.y / this.divider)
+        | 1 << (this.line.firstEnd.y / this.divider)
+        | 1 << (this.line.secondEnd.y / this.divider);
 };
 
 
