@@ -4,7 +4,7 @@ let lines;
 let fpsStack = [];
 let fps;
 let grid;
-const n = 300;
+const n = 1500;
 $(function () {
     canvas = $("#canvas")[0];
     let size = 80;
@@ -45,13 +45,13 @@ function update() {
     //         context.fill();
     //     }
     // });
+    context.fillStyle = "red";
     for (let i = 0; i < lines.length - 1; i++) {
         for (let j = i + 1; j < lines.length; j++) {
             let point = (lines[i].intersect(lines[j]));
+
             if (point) {
-                context.rect(point.x, point.y, 1, 1);
-                context.fillStyle = "red";
-                context.fill();
+                context.fillRect(point.x, point.y, 2, 2);
             }
         }
     }
