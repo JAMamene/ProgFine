@@ -2,7 +2,7 @@ let canvas;
 let context;
 let lines;
 let n;
-let size = 78;
+let size = 39;
 let threshold = 32;
 let fpsStack = [];
 let fps;
@@ -56,7 +56,7 @@ function startVisualization() {
             ));
         }
     }
-    grid = new Grid(16, 16, 40, lines);
+    grid = new Grid(32, 32, 80, lines);
     // lines.push(new LineMask(500, 500, 2, 10, 45, 1, size, 1));
     // lines.push(new LineMask(200, 200, 2, 10, 45, 1, size, 2));
     timerId = window.requestAnimationFrame(update);

@@ -30,13 +30,12 @@ LineMask.prototype.intersect = function (other) {
 };
 
 LineMask.prototype.updateMask = function () {
-    let x1 = 1 << Math.floor((this.line.center.x) / 40);
-    let y1 = 1 << (16 + Math.floor((this.line.center.y) / 40));
-    let x2 = 1 << Math.floor((this.line.firstEnd.x) / 40);
-    let y2 = 1 << (16 + Math.floor((this.line.center.y) / 40));
-    let x3 = 1 << Math.floor((this.line.secondEnd.x) / 40);
-    let y3 = 1 << (16 + Math.floor((this.line.center.y) / 40));
-    this.mask = (x1 | y1 | x2 | y2 | x3 | y3);
+    this.mask = (1 << (this.line.center.x / 40)
+        | 1 << (16 + this.line.center.y / 40))
+        | 1 << (this.line.firstEnd.x / 40)
+        | 1 << (16 + this.line.firstEnd.y / 40)
+        | 1 << (this.line.secondEnd.x / 40)
+        | 1 << (16 + this.line.firstEnd.y / 40);
 };
 
 
