@@ -23,7 +23,7 @@ LineMask.prototype.vectorIntersect = function (other) {
 };
 
 LineMask.prototype.intersect = function (other) {
-    if (this.mask >>> 16 & other.mask >>> 16 && this.mask << 16 & other.mask << 16) {
+    if ((this.mask >>> 16 & other.mask >>> 16) && (this.mask << 16 & other.mask << 16)) {
         return this.line.intersect(other.line);
     }
     return false;

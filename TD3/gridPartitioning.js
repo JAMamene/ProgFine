@@ -46,34 +46,22 @@ Grid.prototype.update = function () {
     }
 };
 
-Grid.prototype.getCollisions = function () {
-    let pairs = [];
-    for (let i = 0; i < this.grid.length; i++) {
-
-        let col = this.grid[i];
-        if (!col) {
-            continue;
-        }
-
-        for (let j = 0; j < col.length; j++) {
-
-            let cell = col[j];
-            if (!cell) {
-                continue;
-            }
-
+Grid.prototype.resolveCollisions = function (context) {
+    this.update();
+    this.grid.forEach(col => {
+        col.forEach(cell => {
             for (let k = 0; k < cell.length; k++) {
 
                 let lineA = cell[k];
 
                 for (let l = k + 1; l < cell.length; l++) {
-                    let lineB = cell[l];
 
-
-                    pairs.push([lineA, lineB]);
+                    let point = (lineA.intersect(cell[l]));
+                    if (point) {
+                        context.fillRect(point.x - 1, point.y - 1, 2, 2);
+                    }
                 }
             }
-        }
-    }
-    return pairs;
+        })
+    });
 };

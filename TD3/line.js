@@ -7,7 +7,6 @@ Line = function (centerX, centerY, speed, angle, rotation, rotationAngle, size, 
     this.size = size;
     this.firstEnd = new Point();
     this.secondEnd = new Point();
-    this.id = id;
 };
 
 Point = function (x, y) {
@@ -43,11 +42,7 @@ Line.prototype.checkForCollision = function (canvas) {
         this.angle = -Math.PI - this.angle;
         this.rotationAngle = -this.rotationAngle;
     }
-    else if (this.firstEnd.y <= 0 || this.secondEnd.y <= 0) {
-        this.angle = -this.angle;
-        this.rotationAngle = -this.rotationAngle;
-    }
-    else if (this.firstEnd.y >= canvas.height || this.secondEnd.y >= canvas.height) {
+    else if (this.firstEnd.y <= 0 || this.secondEnd.y <= 0 ||this.firstEnd.y >= canvas.height || this.secondEnd.y >= canvas.height) {
         this.angle = -this.angle;
         this.rotationAngle = -this.rotationAngle;
     }
@@ -82,6 +77,7 @@ Line.prototype.vectorIntersect = function (other) {
     };
 };
 
+//http://paulbourke.net/geometry/pointlineplane/
 Line.prototype.intersect = function (other) {
     let denominator = ((other.secondEnd.y - other.firstEnd.y) * (this.secondEnd.x - this.firstEnd.x)
         - (other.secondEnd.x - other.firstEnd.x) * (this.secondEnd.y - this.firstEnd.y));
