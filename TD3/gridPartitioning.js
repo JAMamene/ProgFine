@@ -48,7 +48,6 @@ Grid.prototype.update = function () {
 
 Grid.prototype.getCollisions = function () {
     let pairs = [];
-    let checked = {};
     for (let i = 0; i < this.grid.length; i++) {
 
         let col = this.grid[i];
@@ -68,17 +67,10 @@ Grid.prototype.getCollisions = function () {
                 let lineA = cell[k];
 
                 for (let l = k + 1; l < cell.length; l++) {
-
                     let lineB = cell[l];
 
-                    let hashA = lineA.id + ':' + lineB.id;
-                    let hashB = lineB.id + ':' + lineA.id;
 
-                    if (!checked[hashA] && !checked[hashB]) {
-
-                        checked[hashA] = checked[hashB] = true;
-                        pairs.push([lineA, lineB]);
-                    }
+                    pairs.push([lineA, lineB]);
                 }
             }
         }

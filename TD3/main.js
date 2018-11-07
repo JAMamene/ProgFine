@@ -4,7 +4,7 @@ let lines;
 let fpsStack = [];
 let fps;
 let grid;
-const n = 1500;
+const n = 100;
 $(function () {
     canvas = $("#canvas")[0];
     let size = 80;
@@ -12,7 +12,7 @@ $(function () {
     context.fillStyle = "red";
     lines = [];
     for (let i = 0; i < n; i++) {
-        lines.push(new LineMask(
+        lines.push(new Line(
             Math.floor(Math.random() * (canvas.width - size) + size / 2),
             Math.floor(Math.random() * (canvas.height - size) + size / 2),
             Math.floor(Math.random() * 2 + 1),
@@ -40,9 +40,7 @@ function update() {
     // grid.getCollisions().forEach(pair => {
     //     let point = (pair[0].intersect(pair[1]));
     //     if (point) {
-    //         context.rect(point.x, point.y, 1, 1);
-    //         context.fillStyle = "red";
-    //         context.fill();
+    //         context.fillRect(point.x, point.y, 2, 2);
     //     }
     // });
     for (let i = 0; i < lines.length - 1; i++) {

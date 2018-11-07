@@ -83,7 +83,7 @@ Line.prototype.vectorIntersect = function (other) {
 };
 
 Line.prototype.intersect = function (other) {
-    let denominator = ((other.secondEnd.y - other.firstEnd.y) * (this.firstEnd.y - this.firstEnd.x)
+    let denominator = ((other.secondEnd.y - other.firstEnd.y) * (this.secondEnd.x - this.firstEnd.x)
         - (other.secondEnd.x - other.firstEnd.x) * (this.secondEnd.y - this.firstEnd.y));
 
     // Lines are parallel
@@ -93,7 +93,7 @@ Line.prototype.intersect = function (other) {
 
     let ua = ((other.secondEnd.x - other.firstEnd.x) * (this.firstEnd.y - other.firstEnd.y)
         - (other.secondEnd.y - other.firstEnd.y) * (this.firstEnd.x - other.firstEnd.x)) / denominator;
-    let ub = ((this.firstEnd.y - this.firstEnd.x) * (this.firstEnd.y - other.firstEnd.y)
+    let ub = ((this.secondEnd.x - this.firstEnd.x) * (this.firstEnd.y - other.firstEnd.y)
         - (this.secondEnd.y - this.firstEnd.y) * (this.firstEnd.x - other.firstEnd.x)) / denominator;
 
     // is the intersection along the segments
@@ -103,7 +103,7 @@ Line.prototype.intersect = function (other) {
 
     // Return a object with the x and y coordinates of the intersection
     return {
-        x: this.firstEnd.x + ua * (this.firstEnd.y - this.firstEnd.x),
+        x: this.firstEnd.x + ua * (this.secondEnd.x - this.firstEnd.x),
         y: this.firstEnd.y + ua * (this.secondEnd.y - this.firstEnd.y)
     }
 };
