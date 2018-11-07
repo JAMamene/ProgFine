@@ -9,6 +9,7 @@ $(function () {
     canvas = $("#canvas")[0];
     let size = 80;
     context = canvas.getContext('2d');
+    context.fillStyle = "red";
     lines = [];
     for (let i = 0; i < n; i++) {
         lines.push(new LineMask(
@@ -35,7 +36,6 @@ function update() {
     lines.forEach(line => {
         line.update(context, canvas);
     });
-    let time = performance.now();
     // grid.update();
     // grid.getCollisions().forEach(pair => {
     //     let point = (pair[0].intersect(pair[1]));
@@ -45,7 +45,6 @@ function update() {
     //         context.fill();
     //     }
     // });
-    context.fillStyle = "red";
     for (let i = 0; i < lines.length - 1; i++) {
         for (let j = i + 1; j < lines.length; j++) {
             let point = (lines[i].intersect(lines[j]));
@@ -55,8 +54,6 @@ function update() {
             }
         }
     }
-    let final = performance.now();
-    //console.log(final - time);
     if (fpsStack.length < 30) {
         fpsStack.push(performance.now());
     }

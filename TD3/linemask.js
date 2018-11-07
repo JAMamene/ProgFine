@@ -18,6 +18,9 @@ LineMask.prototype.updateSecondEnd = function () {
 LineMask.prototype.checkForCollision = function (canvas) {
     this.line.checkForCollision(canvas);
 };
+LineMask.prototype.vectorIntersect = function (other) {
+    return this.line.vectorIntersect(other.line);
+};
 
 LineMask.prototype.intersect = function (other) {
     if (this.mask >>> 16 & other.mask >>> 16 && this.mask << 16 & other.mask << 16) {

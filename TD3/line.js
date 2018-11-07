@@ -53,39 +53,59 @@ Line.prototype.checkForCollision = function (canvas) {
     }
 };
 
-Line.prototype.intersect = function (other) {
-    let x1 = this.firstEnd.x;
-    let x2 = this.secondEnd.x;
-    let y1 = this.firstEnd.y;
-    let y2 = this.secondEnd.y;
-    let x3 = other.firstEnd.x;
-    let x4 = other.secondEnd.x;
-    let y3 = other.firstEnd.y;
-    let y4 = other.secondEnd.y;
-    // Check if none of the lines are of length 0
-    if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
-        return false
+Line.prototype.vectorIntersect = function (other) {
+    // this.firstEnd = A
+    // this.secondEnd = B
+    // other.firstEnd = C
+    // other.secondEnd = D
+    let ab = {
+        x: this.secondEnd.x - this.firstEnd.x,
+        y: this.secondEnd.y - this.firstEnd.y
+    };
+    let alpha = ab.x * (other.firstEnd.y - this.firstEnd.y) - ab.y * (other.firstEnd.x - this.firstEnd.x);
+    let beta = ab.x * (other.secondEnd.y - this.firstEnd.y) - ab.y * (other.secondEnd.x - this.firstEnd.x);
+    if (!((alpha >= 0 && beta <= 0) || (alpha <= 0 && beta >= 0))) {
+        return false;
     }
+    ab = {
+        x: other.secondEnd.x - other.firstEnd.x,
+        y: other.secondEnd.y - other.firstEnd.x
+    };
+    alpha = ab.x * (this.secondEnd.y - other.firstEnd.y) - ab.y * (this.secondEnd.x - other.firstEnd.x);
+    beta = ab.x * (this.firstEnd.y - other.firstEnd.y) - ab.y * (this.firstEnd.x - other.firstEnd.x);
+    if (!((alpha >= 0 && beta <= 0) || (alpha <= 0 && beta >= 0))) {
+        return false;
+    }
+    return {
+        x: (alpha * other.secondEnd.x - beta * other.firstEnd.x) / (alpha - beta),
+        y: (alpha * other.secondEnd.y - beta * other.firstEnd.y) / (alpha - beta)
+    };
+};
 
-    let denominator = ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+Line.prototype.intersect = function (other) {
+    let denominator = ((other.secondEnd.y - other.firstEnd.y) * (this.firstEnd.y - this.firstEnd.x)
+        - (other.secondEnd.x - other.firstEnd.x) * (this.secondEnd.y - this.firstEnd.y));
 
     // Lines are parallel
     if (denominator === 0) {
-        return false
+        return false;
     }
 
-    let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-    let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+    let ua = ((other.secondEnd.x - other.firstEnd.x) * (this.firstEnd.y - other.firstEnd.y)
+        - (other.secondEnd.y - other.firstEnd.y) * (this.firstEnd.x - other.firstEnd.x)) / denominator;
+    let ub = ((this.firstEnd.y - this.firstEnd.x) * (this.firstEnd.y - other.firstEnd.y)
+        - (this.secondEnd.y - this.firstEnd.y) * (this.firstEnd.x - other.firstEnd.x)) / denominator;
 
     // is the intersection along the segments
     if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-        return false
+        return false;
     }
 
     // Return a object with the x and y coordinates of the intersection
-    let x = x1 + ua * (x2 - x1);
-    let y = y1 + ua * (y2 - y1);
-    return {x, y}
+    return {
+        x: this.firstEnd.x + ua * (this.firstEnd.y - this.firstEnd.x),
+        y: this.firstEnd.y + ua * (this.secondEnd.y - this.firstEnd.y)
+    }
 };
 
 
