@@ -51,3 +51,12 @@ LineMask.prototype.update = function (ctx, canvas) {
     this.updateMask();
     this.draw(ctx);
 };
+
+LineMask.prototype.updatePos = function (canvas) {
+    this.line.center.x += this.line.speed * Math.cos(this.line.angle);
+    this.line.center.y += this.line.speed * Math.sin(this.line.angle);
+    this.line.rotation += this.line.rotationAngle;
+    this.updateFirstEnd();
+    this.updateSecondEnd();
+    this.updateMask();
+};

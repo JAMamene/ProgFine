@@ -45,26 +45,6 @@ Grid.prototype.update = function () {
     }
 };
 
-Grid.prototype.resolveCollisions = function (context) {
-    this.update();
-    this.grid.forEach(col => {
-        col.forEach(cell => {
-            for (let k = 0; k < cell.length; k++) {
-
-                let lineA = cell[k];
-
-                for (let l = k + 1; l < cell.length; l++) {
-
-                    let point = (lineA.intersect(cell[l]));
-                    if (point) {
-                        context.fillRect(point.x - 1, point.y - 1, 2, 2);
-                    }
-                }
-            }
-        });
-    });
-};
-
 Grid.prototype.draw = function (context) {
     for (let i = 0; i < this.grid.length; i++) {
         if (!this.grid[i]) {

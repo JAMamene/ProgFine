@@ -42,7 +42,7 @@ Line.prototype.checkForCollision = function (canvas) {
         this.angle = -Math.PI - this.angle;
         this.rotationAngle = -this.rotationAngle;
     }
-    else if (this.firstEnd.y <= 0 || this.secondEnd.y <= 0 ||this.firstEnd.y >= canvas.height || this.secondEnd.y >= canvas.height) {
+    else if (this.firstEnd.y <= 0 || this.secondEnd.y <= 0 || this.firstEnd.y >= canvas.height || this.secondEnd.y >= canvas.height) {
         this.angle = -this.angle;
         this.rotationAngle = -this.rotationAngle;
     }
@@ -113,4 +113,13 @@ Line.prototype.update = function (ctx, canvas) {
     this.updateFirstEnd();
     this.updateSecondEnd();
     this.draw(ctx);
+};
+
+Line.prototype.updatePos = function (canvas) {
+    this.checkForCollision(canvas);
+    this.center.x += this.speed * Math.cos(this.angle);
+    this.center.y += this.speed * Math.sin(this.angle);
+    this.rotation += this.rotationAngle;
+    this.updateFirstEnd();
+    this.updateSecondEnd();
 };
