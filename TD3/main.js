@@ -2,17 +2,21 @@ let canvas;
 let context;
 let lines;
 let n;
+
 let size = 40;
-let fpsCounterList = [];
-let benchLimit = 100;
-let fps;
 let grid;
 let tree;
-let bench = false;
 let algorithm;
 let timerId = 0;
 let running = false;
 let gridDebug = false;
+
+let fpsCounterList = [];
+let fps;
+
+let benchLimit = 100;
+let bailout = 100;
+
 $(function () {
     // Feeds values of the form to benchmark when runBench is clicked
     $("#runVisualization").click(function (e) {
@@ -52,126 +56,6 @@ function newRandomLine(mask) {
             size,
         );
     }
-}
-
-function startBenchmarking() {
-    let lineNumbers = [100, 250, 500, 1000, 1500, 2000, 2500, 3000];
-    let valuesScatter = new Array(lineNumbers.length - 2);
-    for (let linesIndex = 0; linesIndex < lineNumbers.length; linesIndex++) {
-        let datumScatter = new Array(algorithms.length + 1);
-        datumScatter[0] = Math.log2(lineNumbers[linesIndex]);
-        for (let algIndex = 0; algIndex < algorithms.length; algIndex++) {
-            let frameTimes = algBenchmark(algorithms[algIndex], lineNumbers[linesIndex]);
-            if (linesIndex >= 2 && frameTimes != null) {
-                datumScatter[algIndex + 1] = Math.log2(average(frameTimes)*1000);
-            }
-
-        }
-        if (linesIndex >= 2) {
-            valuesScatter[linesIndex - 2] = datumScatter;
-        }
-    }
-    google.charts.load('upcoming', {'packages': ['corechart']});
-    console.log(valuesScatter);
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-        // Erase current ScatterChart and create a new one
-        $("#chartArea").empty().append("<div id=\"chartLinear\" style=\"width: 100%\"></div>\n");
-
-        // Add legend to every column of the values of scatter
-        let legend = new Array(algorithms.length + 1);
-        legend[0] = "Size";
-        for (let i = 1; i <= algorithms.length; i++) {
-            legend[i] = algorithms[i - 1];
-        }
-        valuesScatter.unshift(legend);
-        let dataScatter = google.visualization.arrayToDataTable(
-            valuesScatter
-        );
-
-        // Generate scatterChart with options
-        let trendline = {
-            type: 'linear',
-            showR2: true,
-            visibleInLegend: true
-        };
-        let trendlines = {};
-        for (let i = 0; i < algorithms.length; i++) {
-            trendlines[i] = trendline;
-        }
-        let optionsScatter = {
-            title: 'Average frame time by number of lines',
-            chartArea: {
-                width: '70%',
-                right: '26%'
-            },
-            explorer: {},
-            hAxis: {
-                title: 'Number of lines Log2(LineNumber)',
-                minValue: 0,
-                viewWindow: {
-                    min: 0,
-                    max: 15
-                },
-            },
-            vAxis: {
-                title: 'Average frametime Log2(NanoSeconds)',
-                minValue: 0,
-                viewWindow: {
-                    min: 0,
-                    max: 100
-                },
-            },
-            legend: {
-                textStyle: {
-                    fontSize: 14
-                }
-            },
-            height: 900,
-            trendlines: trendlines
-        };
-        let chartLinear = new google.visualization.ScatterChart($("#chartLinear")[0]);
-        chartLinear.draw(dataScatter, optionsScatter);
-    }
-}
-
-function algBenchmark(algo, nbLines) {
-    canvas = $("#canvas")[0];
-    context = canvas.getContext('2d');
-    lines = new Array(nbLines);
-    if (algo !== "mask") {
-        for (let i = 0; i < nbLines; i++) {
-            lines[i] = newRandomLine(false);
-        }
-    }
-    else {
-        for (let i = 0; i < nbLines; i++) {
-            lines[i] = newRandomLine(true);
-        }
-    }
-    if (algo === "grid") {
-        grid = new Grid(canvas.width / (size / 2), size, lines);
-    }
-    return updateBench(algo, [], 0);
-}
-
-function updateBench(algo, fpsList, i) {
-    if (i >= benchLimit) {
-        return fpsList;
-    }
-    lines.forEach(line => {
-        line.updatePos(canvas);
-    });
-
-    let frameTime = performance.now();
-    computeCollisions(algo, true);
-    frameTime = performance.now() - frameTime;
-    if (frameTime > 100) {
-        return null;
-    }
-    fpsList.push(frameTime);
-    return updateBench(algo, fpsList, ++i);
 }
 
 function startVisualization() {
@@ -299,6 +183,126 @@ function computeCollisions(algorithm, bench) {
         default:
     }
     //console.log(algorithm + " " + colls);
+}
+
+function algBenchmark(algo, nbLines) {
+    canvas = $("#canvas")[0];
+    context = canvas.getContext('2d');
+    lines = new Array(nbLines);
+    if (algo !== "mask") {
+        for (let i = 0; i < nbLines; i++) {
+            lines[i] = newRandomLine(false);
+        }
+    }
+    else {
+        for (let i = 0; i < nbLines; i++) {
+            lines[i] = newRandomLine(true);
+        }
+    }
+    if (algo === "grid") {
+        grid = new Grid(canvas.width / (size / 2), size, lines);
+    }
+    return updateBench(algo, [], 0);
+}
+
+function updateBench(algo, fpsList, i) {
+    if (i >= benchLimit) {
+        return fpsList;
+    }
+    let frameTime = performance.now();
+    lines.forEach(line => {
+        line.updatePos(canvas);
+
+    });
+    computeCollisions(algo, false);
+    frameTime = performance.now() - frameTime;
+    if (frameTime > bailout) {
+        return null;
+    }
+    fpsList.push(frameTime);
+    return updateBench(algo, fpsList, ++i);
+}
+
+function startBenchmarking() {
+    let lineNumbers = [100, 250, 500, 1000, 1500, 2000, 2500, 3000];
+    let valuesScatter = new Array(lineNumbers.length - 2);
+    for (let linesIndex = 0; linesIndex < lineNumbers.length; linesIndex++) {
+        let datumScatter = new Array(algorithms.length + 1);
+        datumScatter[0] = Math.log2(lineNumbers[linesIndex]);
+        for (let algIndex = 0; algIndex < algorithms.length; algIndex++) {
+            let frameTimes = algBenchmark(algorithms[algIndex], lineNumbers[linesIndex]);
+            if (linesIndex >= 2 && frameTimes != null) {
+                datumScatter[algIndex + 1] = Math.log2(average(frameTimes) * 1000);
+            }
+
+        }
+        if (linesIndex >= 2) {
+            valuesScatter[linesIndex - 2] = datumScatter;
+        }
+    }
+    google.charts.load('upcoming', {'packages': ['corechart']});
+    console.log(valuesScatter);
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        // Erase current ScatterChart and create a new one
+        $("#chartArea").empty().append("<div id=\"chartLinear\" style=\"width: 100%\"></div>\n");
+
+        // Add legend to every column of the values of scatter
+        let legend = new Array(algorithms.length + 1);
+        legend[0] = "Size";
+        for (let i = 1; i <= algorithms.length; i++) {
+            legend[i] = algorithms[i - 1];
+        }
+        valuesScatter.unshift(legend);
+        let dataScatter = google.visualization.arrayToDataTable(
+            valuesScatter
+        );
+
+        // Generate scatterChart with options
+        let trendline = {
+            type: 'linear',
+            showR2: true,
+            visibleInLegend: true
+        };
+        let trendlines = {};
+        for (let i = 0; i < algorithms.length; i++) {
+            trendlines[i] = trendline;
+        }
+        let optionsScatter = {
+            title: 'Average frame time by number of lines',
+            chartArea: {
+                width: '70%',
+                right: '26%'
+            },
+            explorer: {},
+            hAxis: {
+                title: 'Number of lines Log2(LineNumber)',
+                minValue: 0,
+                viewWindow: {
+                    min: 0,
+                    max: 15
+                },
+            },
+            vAxis: {
+                title: 'Average frametime Log2(NanoSeconds)',
+                minValue: 0,
+                viewWindow: {
+                    min: 0,
+                    max: 100
+                },
+            },
+            legend: {
+                textStyle: {
+                    fontSize: 14
+                }
+            },
+            height: 900,
+            trendlines: trendlines
+        };
+        let chartLinear = new google.visualization.ScatterChart($("#chartLinear")[0]);
+        chartLinear.draw(dataScatter, optionsScatter);
+    }
 }
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
